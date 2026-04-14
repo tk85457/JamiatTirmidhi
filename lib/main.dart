@@ -23,9 +23,9 @@ void main() async {
 
   final prefs = await SharedPreferences.getInstance();
 
-  // Pre-initialize Isar on non-web platforms (Isar uses FFI, not supported on web)
+  // Initialize Isar in background on non-web platforms
   if (!kIsWeb) {
-    await IsarService.instance.db;
+    IsarService.instance.init();
   }
 
   runApp(

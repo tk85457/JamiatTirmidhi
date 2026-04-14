@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'isar_models.dart';
@@ -6,13 +7,23 @@ import '../database/app_database.dart';
 class IsarService {
   static final IsarService instance = IsarService._init();
   Isar? _isar;
+  final syncProgress = ValueNotifier<double>(0);
+  bool _isInitializing = false;
+  bool _ready = false;
+  bool get isReady => _ready;
 
   IsarService._init();
 
   Future<Isar> get db async {
     if (_isar != null) return _isar!;
-    _isar = await _initIsar();
-    return _isar!;
+    return await _initIsar();
+  }
+
+  /// Initialize Isar in background
+  Future<void> init() async {
+    if (_isInitializing || _ready) return;
+    _isInitializing = true;
+    await _initIsar();
   }
 
   Future<Isar> _initIsar() async {
@@ -30,10 +41,21 @@ class IsarService {
       inspector: true,
     );
 
+    _isar = isar;
+    
     // Initial sync check
     final count = await isar.isarHadiths.count();
     if (count == 0) {
-      await _syncFromSqlite(isar);
+      // Run sync in background without blocking the "init" return if possible, 
+      // but here we actually want to finish the Isar open quickly.
+      _syncFromSqlite(isar).then((_) {
+        _ready = true;
+        _isInitializing = false;
+      });
+    } else {
+      _ready = true;
+      _isInitializing = false;
+      syncProgress.value = 1.0;
     }
 
     return isar;
@@ -64,6 +86,9 @@ class IsarService {
     // 2. Sync Hadiths (in batches to avoid memory issues)
     const batchSize = 1000;
     int offset = 0;
+    final totalHadithsRaw = await db.rawQuery('SELECT COUNT(*) as c FROM hadiths');
+    final totalHadiths = totalHadithsRaw.first['c'] as int;
+    
     while (true) {
       final hadithsRaw = await db.query(
         'hadiths',
@@ -88,6 +113,9 @@ class IsarService {
         await isar.isarHadiths.putAll(isarHadiths);
       });
       offset += batchSize;
+      
+      // Update progress
+      syncProgress.value = (offset / (totalHadiths > 0 ? totalHadiths : 1)).clamp(0.0, 1.0);
     }
 
     // 3. Sync User Data (Bookmarks)

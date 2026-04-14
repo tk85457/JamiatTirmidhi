@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import '../../data/isar/isar_service.dart';
 import '../../theme/app_theme.dart';
 import '../../data/repositories/hadith_repository.dart';
 import '../../domain/models/models.dart';
@@ -188,6 +189,59 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ],
             ),
           ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.05, end: 0),
+          
+          // Indexing Status (if not ready)
+          ValueListenableBuilder<double>(
+            valueListenable: IsarService.instance.syncProgress,
+            builder: (context, progress, child) {
+              if (progress < 1.0) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.amber),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Text(
+                              'Optimizing search index for first use...',
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.amber),
+                            ),
+                          ),
+                          Text(
+                            '${(progress * 100).toInt()}%',
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.amber),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(2),
+                        child: LinearProgressIndicator(
+                          value: progress,
+                          backgroundColor: Colors.amber.withValues(alpha: 0.1),
+                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
+                          minHeight: 3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn();
+              }
+              return const SizedBox.shrink();
+            },
+          ),
 
           // Results
           Expanded(
