@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../theme/app_theme.dart';
@@ -10,6 +9,8 @@ import '../../data/repositories/hadith_repository.dart';
 import '../../domain/models/models.dart';
 import '../settings/settings_provider.dart';
 import '../common/widgets/shimmer_loading.dart';
+import '../../core/ads/ad_free_service.dart';
+import '../../widgets/ad_choice_dialog.dart';
 
 final chaptersProvider = FutureProvider<List<Chapter>>((ref) async {
   final repo = ref.watch(hadithRepositoryProvider);
@@ -62,137 +63,141 @@ class HomeScreen extends ConsumerWidget {
     final chaptersAsync = ref.watch(chaptersProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Sunan Ibn Majah',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              context.go('/home/settings');
-            },
+    return AdChoicePromptHost(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Jami at-Tirmidhi Hadith',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
           ),
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
-            onSelected: (value) {
-              HapticFeedback.selectionClick();
-              switch (value) {
-                case 'Backup':
-                  _showBackupDialog(context, ref);
-                  break;
-                case 'Author':
-                  context.go('/home/about');
-                  break;
-                case 'AppIntro':
-                  context.go('/home/about');
-                  break;
-                case 'PrivacyPolicy':
-                  context.go('/home/privacy');
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'Backup',
-                child: Text('Backup and Restore Data'),
-              ),
-              const PopupMenuItem(
-                value: 'Author',
-                child: Text('Author Introduction'),
-              ),
-              const PopupMenuItem(
-                value: 'AppIntro',
-                child: Text('App Introduction'),
-              ),
-              const PopupMenuItem(
-                value: 'PrivacyPolicy',
-                child: Text('Privacy Policy'),
-              ),
-            ],
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          HapticFeedback.mediumImpact();
-          ref.invalidate(chaptersProvider);
-          ref.invalidate(hadithOfTheDayProvider);
-          ref.invalidate(statsProvider);
-          ref.invalidate(chapterProgressProvider);
-        },
-        child: CustomScrollView(
-          slivers: [
-            // Grid Menu
-            SliverToBoxAdapter(
-              child: _buildGridMenu(context, ref, isDark)
-                  .animate()
-                  .fadeIn(duration: 600.ms)
-                  .slideY(begin: -0.1, end: 0, curve: Curves.easeOutCubic),
-            ),
-            // Hadith of the Day (Premium Card)
-            SliverToBoxAdapter(
-              child: _buildHadithOfTheDay(context, ref, isDark)
-                  .animate()
-                  .fadeIn(delay: 150.ms, duration: 600.ms)
-                  .scale(
-                    begin: const Offset(0.95, 0.95),
-                    end: const Offset(1, 1),
-                    curve: Curves.easeOutBack,
-                  ),
-            ),
-            // Stats Dashboard
-            SliverToBoxAdapter(
-              child: _buildStatsDashboard(context, ref, isDark)
-                  .animate()
-                  .fadeIn(delay: 300.ms, duration: 600.ms)
-                  .slideX(begin: 0.1, end: 0),
-            ),
-            // Search Bar
-            SliverToBoxAdapter(
-              child: _buildSearchBar(context, isDark)
-                  .animate()
-                  .fadeIn(delay: 400.ms, duration: 600.ms)
-                  .shimmer(color: Colors.white24),
-            ),
-            chaptersAsync.when(
-              loading: () => SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) =>
-                      ShimmerLoading(child: ShimmerLoading.chapterCard()),
-                  childCount: 6,
+          centerTitle: true,
+          actions: [
+            // Replaces the old "watch rewarded ad" icon: opens the 24h ad-free choice.
+            ValueListenableBuilder<bool>(
+              valueListenable: AdFreeService.adFreeNotifier,
+              builder: (context, adFree, _) => IconButton(
+                icon: Icon(
+                  adFree ? Icons.verified_rounded : Icons.volunteer_activism,
+                  color: adFree ? Colors.greenAccent : Colors.amber,
                 ),
+                tooltip: adFree
+                    ? 'Banner ads are off'
+                    : 'Remove banner ads for 24 hours',
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  AdChoiceDialog.show(context);
+                },
               ),
-              error: (e, st) =>
-                  SliverFillRemaining(child: Center(child: Text('Error: $e'))),
-              data: (chapters) {
-                final progressAsync = ref.watch(chapterProgressProvider);
-                final progressMap = progressAsync.value ?? {};
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final chapter = chapters[index];
-                    final progress = progressMap[chapter.id];
-                    return _ChapterCard(
-                      chapter: chapter,
-                      index: index,
-                      isDark: isDark,
-                      progress: progress,
-                    );
-                  }, childCount: chapters.length),
-                );
+            ),
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                context.go('/home/settings');
               },
             ),
-            // Bottom padding
-            const SliverToBoxAdapter(child: SizedBox(height: 80)),
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              onSelected: (value) {
+                HapticFeedback.selectionClick();
+                switch (value) {
+                  case 'Backup':
+                    _showBackupDialog(context, ref);
+                    break;
+                  case 'Author':
+                    context.go('/home/about');
+                    break;
+                  case 'AppIntro':
+                    context.go('/home/about');
+                    break;
+                  case 'PrivacyPolicy':
+                    context.go('/home/privacy');
+                    break;
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'Backup',
+                  child: Text('Backup and Restore Data'),
+                ),
+                const PopupMenuItem(
+                  value: 'Author',
+                  child: Text('Author Introduction'),
+                ),
+                const PopupMenuItem(
+                  value: 'AppIntro',
+                  child: Text('App Introduction'),
+                ),
+                const PopupMenuItem(
+                  value: 'PrivacyPolicy',
+                  child: Text('Privacy Policy'),
+                ),
+              ],
+            ),
           ],
         ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            HapticFeedback.mediumImpact();
+            ref.invalidate(chaptersProvider);
+            ref.invalidate(hadithOfTheDayProvider);
+            ref.invalidate(statsProvider);
+            ref.invalidate(chapterProgressProvider);
+          },
+          child: CustomScrollView(
+            slivers: [
+              // Grid Menu
+              SliverToBoxAdapter(
+                child: _buildGridMenu(context, ref, isDark),
+              ),
+              // Hadith of the Day (Premium Card)
+              SliverToBoxAdapter(
+                child: _buildHadithOfTheDay(context, ref, isDark),
+              ),
+              // Stats Dashboard
+              SliverToBoxAdapter(
+                child: _buildStatsDashboard(context, ref, isDark),
+              ),
+              // Search Bar
+              SliverToBoxAdapter(
+                child: _buildSearchBar(context, isDark),
+              ),
+              chaptersAsync.when(
+                loading: () => SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) =>
+                        ShimmerLoading(child: ShimmerLoading.chapterCard()),
+                    childCount: 6,
+                  ),
+                ),
+                error: (e, st) => SliverFillRemaining(
+                  child: Center(child: Text('Error: $e')),
+                ),
+                data: (chapters) {
+                  final progressAsync = ref.watch(chapterProgressProvider);
+                  final progressMap = progressAsync.value ?? {};
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final chapter = chapters[index];
+                      final progress = progressMap[chapter.id];
+                      return _ChapterCard(
+                        chapter: chapter,
+                        index: index,
+                        isDark: isDark,
+                        progress: progress,
+                      );
+                    }, childCount: chapters.length),
+                  );
+                },
+              ),
+              // Bottom padding
+              const SliverToBoxAdapter(child: SizedBox(height: 110)),
+            ],
+          ),
+        ),
+        floatingActionButton: _buildResumeButton(context, ref, isDark),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
-      floatingActionButton: _buildResumeButton(context, ref, isDark),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
@@ -215,8 +220,12 @@ class HomeScreen extends ConsumerWidget {
         final primary = Theme.of(context).primaryColor;
         // Create darker and lighter variants for gradient
         final HSLColor hsl = HSLColor.fromColor(primary);
-        final darkVariant = hsl.withLightness((hsl.lightness * 0.5).clamp(0.0, 1.0)).toColor();
-        final midVariant = hsl.withLightness((hsl.lightness * 0.7).clamp(0.0, 1.0)).toColor();
+        final darkVariant = hsl
+            .withLightness((hsl.lightness * 0.5).clamp(0.0, 1.0))
+            .toColor();
+        final midVariant = hsl
+            .withLightness((hsl.lightness * 0.7).clamp(0.0, 1.0))
+            .toColor();
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
@@ -490,15 +499,10 @@ class HomeScreen extends ConsumerWidget {
           _showFindHadithDialog(context, ref);
         },
       ),
-      _GridItem(
-        Icons.search_rounded,
-        const Color(0xFFE65100),
-        'Search',
-        () {
-          HapticFeedback.lightImpact();
-          context.go('/home/search');
-        },
-      ),
+      _GridItem(Icons.search_rounded, const Color(0xFFE65100), 'Search', () {
+        HapticFeedback.lightImpact();
+        context.go('/home/search');
+      }),
       _GridItem(
         Icons.bookmark_rounded,
         const Color(0xFFC62828),
@@ -541,19 +545,15 @@ class HomeScreen extends ConsumerWidget {
           _showFeedbackDialog(context);
         },
       ),
-      _GridItem(
-        Icons.share_rounded,
-        const Color(0xFF4527A0),
-        'Share App',
-        () {
-          HapticFeedback.lightImpact();
-          SharePlus.instance.share(
-            ShareParams(
-              text: 'Download Sunan Ibn Majah app — Read authentic Hadiths with Urdu, Arabic & English translations:\nhttps://play.google.com/store/apps/details?id=app.sunanibnmajah',
-            ),
-          );
-        },
-      ),
+      _GridItem(Icons.share_rounded, const Color(0xFF4527A0), 'Share App', () {
+        HapticFeedback.lightImpact();
+        SharePlus.instance.share(
+          ShareParams(
+            text:
+                'Download Jami at-Tirmidhi Hadith app — Read authentic Hadiths with Urdu, Arabic & English translations:\nhttps://play.google.com/store/apps/details?id=com.jami.at_tirmidhi',
+          ),
+        );
+      }),
     ];
 
     return Container(
@@ -591,11 +591,7 @@ class HomeScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    item.icon,
-                    size: 32,
-                    color: item.color,
-                  ),
+                  Icon(item.icon, size: 32, color: item.color),
                   const SizedBox(height: 8),
                   Text(
                     item.label,
@@ -668,7 +664,7 @@ class HomeScreen extends ConsumerWidget {
               onTap: () async {
                 final repo = ref.read(hadithRepositoryProvider);
                 final data = await repo.exportUserData();
-                Navigator.pop(ctx);
+                if (ctx.mounted) Navigator.pop(ctx);
                 final text = jsonEncode(data);
                 await Clipboard.setData(ClipboardData(text: text));
                 if (context.mounted) {
@@ -828,10 +824,9 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildResumeButton(BuildContext context, WidgetRef ref, bool isDark) {
-    final progressAsync = ref.watch(lastProgressProvider);
-
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 60),
+      // Lifted a little above the bottom edge / gesture bar.
+      margin: const EdgeInsets.fromLTRB(60, 0, 60, 44),
       child: Material(
         color: isDark ? AppTheme.cardDark : Colors.white,
         borderRadius: BorderRadius.circular(30),
@@ -839,20 +834,23 @@ class HomeScreen extends ConsumerWidget {
         shadowColor: Theme.of(context).primaryColor.withValues(alpha: 0.3),
         child: InkWell(
           borderRadius: BorderRadius.circular(30),
-          onTap: () {
-            progressAsync.whenData((progress) {
-              if (progress != null) {
-                context.go(
-                  '/home/chapter/${progress.chapterId}?startIndex=${progress.hadithIndex}',
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Start reading a hadith to enable resume!'),
-                  ),
-                );
-              }
-            });
+          onTap: () async {
+            HapticFeedback.lightImpact();
+            final progress = await ref
+                .read(hadithRepositoryProvider)
+                .getLastReadingProgress();
+            if (!context.mounted) return;
+            if (progress != null) {
+              context.go(
+                '/home/chapter/${progress.chapterId}?startIndex=${progress.hadithIndex}',
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Start reading a hadith to enable resume!'),
+                ),
+              );
+            }
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -1038,26 +1036,13 @@ class HomeScreen extends ConsumerWidget {
                               color: Theme.of(context).primaryColor,
                             ),
                           ),
-                        )
-                        .animate(
-                          onPlay: (controller) =>
-                              controller.repeat(reverse: true),
-                        )
-                        .shimmer(
-                          duration: 2.seconds,
-                          color: Theme.of(
-                            context,
-                          ).primaryColor.withValues(alpha: 0.3),
                         ),
                   ],
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                   backgroundColor: isDark ? AppTheme.cardDark : Colors.white,
-                )
-                .animate()
-                .scale(duration: 400.ms, curve: Curves.easeOutBack)
-                .fadeIn(duration: 400.ms);
+                );
           },
         );
       },
@@ -1204,13 +1189,7 @@ class _ChapterCard extends ConsumerWidget {
               ],
             ),
           ),
-        )
-        .animate()
-        .fade(
-          duration: 300.ms,
-          delay: (index * 30).ms < 600.ms ? (index * 30).ms : 0.ms,
-        )
-        .slideX(begin: 0.05, end: 0, duration: 300.ms, curve: Curves.easeOut);
+        );
   }
 }
 

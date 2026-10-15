@@ -28,7 +28,9 @@ class CollectionsScreen extends ConsumerWidget {
             icon: const Icon(Icons.search),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Search collections coming soon!')),
+                const SnackBar(
+                  content: Text('Search collections coming soon!'),
+                ),
               );
             },
           ),
@@ -39,7 +41,11 @@ class CollectionsScreen extends ConsumerWidget {
         ],
       ),
       body: collectionsAsync.when(
-        loading: () => Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColor)),
+        loading: () => Center(
+          child: CircularProgressIndicator(
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (collections) {
           if (collections.isEmpty) {
@@ -47,57 +53,86 @@ class CollectionsScreen extends ConsumerWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(12),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 40),
-                    decoration: BoxDecoration(
-                      color: isDark ? AppTheme.cardDark : Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                            shape: BoxShape.circle,
+                  child:
+                      Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 40,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark ? AppTheme.cardDark : Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(
+                                    alpha: isDark ? 0.2 : 0.04,
+                                  ),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                Container(
+                                      padding: const EdgeInsets.all(24),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(
+                                          context,
+                                        ).primaryColor.withValues(alpha: 0.1),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.create_new_folder_outlined,
+                                        size: 64,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                    )
+                                    .animate(
+                                      onPlay: (controller) =>
+                                          controller.repeat(reverse: true),
+                                    )
+                                    .scale(
+                                      begin: const Offset(1, 1),
+                                      end: const Offset(1.05, 1.05),
+                                      duration: 1500.ms,
+                                      curve: Curves.easeInOut,
+                                    ),
+                                const SizedBox(height: 24),
+                                Text(
+                                  'No Collections',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? Colors.grey.shade300
+                                        : Colors.grey.shade800,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Tap the + icon to create your first\nhadith collection.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    height: 1.4,
+                                    color: isDark
+                                        ? Colors.grey.shade400
+                                        : Colors.grey.shade600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                          .animate()
+                          .fadeIn(duration: 500.ms)
+                          .slideY(
+                            begin: 0.1,
+                            end: 0,
+                            duration: 500.ms,
+                            curve: Curves.easeOut,
                           ),
-                          child: Icon(
-                            Icons.create_new_folder_outlined,
-                            size: 64,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                         .scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05), duration: 1500.ms, curve: Curves.easeInOut),
-                        const SizedBox(height: 24),
-                        Text(
-                          'No Collections',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.grey.shade300 : Colors.grey.shade800,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Tap the + icon to create your first\nhadith collection.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 15,
-                            height: 1.4,
-                            color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.1, end: 0, duration: 500.ms, curve: Curves.easeOut),
                 ),
               ],
             );
@@ -131,7 +166,10 @@ class CollectionsScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Create Collection', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Create Collection',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: TextField(
           controller: controller,
           autofocus: true,
@@ -140,7 +178,10 @@ class CollectionsScreen extends ConsumerWidget {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
+              borderSide: BorderSide(
+                color: Theme.of(context).primaryColor,
+                width: 2,
+              ),
             ),
           ),
         ),
@@ -181,9 +222,13 @@ class _CollectionCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final countAsync = ref.watch(FutureProvider((ref) async {
-      return ref.watch(hadithRepositoryProvider).getCollectionHadithCount(collection.id);
-    }));
+    final countAsync = ref.watch(
+      FutureProvider((ref) async {
+        return ref
+            .watch(hadithRepositoryProvider)
+            .getCollectionHadithCount(collection.id);
+      }),
+    );
 
     return Dismissible(
       key: Key('collection_${collection.id}'),
@@ -203,9 +248,14 @@ class _CollectionCard extends ConsumerWidget {
           context: context,
           builder: (ctx) => AlertDialog(
             title: const Text('Delete Collection?'),
-            content: Text('Are you sure you want to delete "${collection.name}"?'),
+            content: Text(
+              'Are you sure you want to delete "${collection.name}"?',
+            ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Cancel'),
+              ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                 onPressed: () => Navigator.pop(ctx, true),
@@ -247,12 +297,35 @@ class _CollectionCard extends ConsumerWidget {
             ),
           ),
           subtitle: countAsync.when(
-            data: (count) => Text('$count hadiths', style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.grey.shade500)),
-            loading: () => Text('...', style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.grey.shade500)),
-            error: (_, st) => Text('0 hadiths', style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.grey.shade500)),
+            data: (count) => Text(
+              '$count hadiths',
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark ? Colors.white70 : Colors.grey.shade500,
+              ),
+            ),
+            loading: () => Text(
+              '...',
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark ? Colors.white70 : Colors.grey.shade500,
+              ),
+            ),
+            error: (_, st) => Text(
+              '0 hadiths',
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark ? Colors.white70 : Colors.grey.shade500,
+              ),
+            ),
           ),
-          trailing: Icon(Icons.chevron_right, color: Theme.of(context).primaryColor),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          trailing: Icon(
+            Icons.chevron_right,
+            color: Theme.of(context).primaryColor,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           onTap: () {
             context.push('/home/collections/${collection.id}');
           },

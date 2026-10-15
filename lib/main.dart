@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
@@ -9,9 +10,17 @@ import 'theme/app_theme.dart';
 import 'core/router.dart';
 import 'features/settings/settings_provider.dart';
 import 'data/isar/isar_service.dart';
+import 'core/ads/ad_free_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+    ),
+  );
 
   // Initialize sqflite for web or desktop
   if (kIsWeb) {
@@ -22,24 +31,31 @@ void main() async {
   }
 
   final prefs = await SharedPreferences.getInstance();
-
-  // Initialize Isar in background on non-web platforms
-  if (!kIsWeb) {
-    IsarService.instance.init();
-  }
+  AdFreeService.init(
+    prefs,
+  ); // 24h banner-free state must be known before first frame
 
   runApp(
     ProviderScope(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ],
-      child: const SunanIbnMajahApp(),
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      child: const JamiAtTirmidhiApp(),
     ),
   );
+
+  // Initialize Isar purely in background after initial UI frame is drawn (prevents ANR)
+  if (!kIsWeb) {
+    // Wait until the home screen is up and idle: the first-run Isar sync copies
+    // every hadith and would otherwise compete with the UI on low-end phones.
+    Future<void>.delayed(const Duration(seconds: 8), () {
+      IsarService.instance.init().catchError((e) {
+        debugPrint('Non-blocking background IsarService init error: $e');
+      });
+    });
+  }
 }
 
-class SunanIbnMajahApp extends ConsumerWidget {
-  const SunanIbnMajahApp({super.key});
+class JamiAtTirmidhiApp extends ConsumerWidget {
+  const JamiAtTirmidhiApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -48,9 +64,11 @@ class SunanIbnMajahApp extends ConsumerWidget {
     final primaryColor = AppTheme.getPrimaryColor(settings.uiColor);
 
     return MaterialApp.router(
-      title: 'Sunan Ibn Majah - Hadith',
+      title: 'Jami at-Tirmidhi Hadith',
       debugShowCheckedModeBanner: false,
-      theme: settings.isDarkMode ? AppTheme.darkTheme(primaryColor) : AppTheme.lightTheme(primaryColor),
+      theme: settings.isDarkMode
+          ? AppTheme.darkTheme(primaryColor)
+          : AppTheme.lightTheme(primaryColor),
       routerConfig: goRouter,
     );
   }

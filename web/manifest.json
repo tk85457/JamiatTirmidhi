@@ -1,11 +1,11 @@
 {
-     "name": "Sahih Muslim Ultimate",
-     "short_name": "Sahih Muslim Ultimate",
+     "name": "Jami at-Tirmidhi",
+     "short_name": "Jami at-Tirmidhi",
      "start_url": ".",
      "display": "standalone",
      "background_color": "#0175C2",
      "theme_color": "#0175C2",
-     "description": "A new Flutter project.",
+     "description": "Jami at-Tirmidhi Hadith App",
      "orientation": "portrait-primary",
      "prefer_related_applications": false,
      "icons": [

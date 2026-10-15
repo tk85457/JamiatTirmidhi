@@ -164,10 +164,10 @@ class CollectionDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Sunan Ibn Majah',
+                        'Jami at-Tirmidhi',
                         style: TextStyle(
                           fontSize: 11,
-                          color: Colors.grey.shade500,
+                          color: isDark ? Colors.white60 : Colors.grey.shade500,
                           fontStyle: FontStyle.italic,
                         ),
                       ),

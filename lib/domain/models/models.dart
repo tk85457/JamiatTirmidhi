@@ -17,9 +17,12 @@ class Chapter {
   });
 
   Map<String, dynamic> toMap() => {
-    'id': id, 'book_number': bookNumber,
-    'title_arabic': titleArabic, 'title_urdu': titleUrdu,
-    'title_english': titleEnglish, 'hadith_count': hadithCount,
+    'id': id,
+    'book_number': bookNumber,
+    'title_arabic': titleArabic,
+    'title_urdu': titleUrdu,
+    'title_english': titleEnglish,
+    'hadith_count': hadithCount,
   };
 
   factory Chapter.fromMap(Map<String, dynamic> m) => Chapter(
@@ -53,8 +56,12 @@ class Hadith {
   });
 
   Map<String, dynamic> toMap() => {
-    'id': id, 'chapter_id': chapterId, 'hadith_number': hadithNumber,
-    'arabic_text': arabicText, 'urdu_text': urduText, 'english_text': englishText,
+    'id': id,
+    'chapter_id': chapterId,
+    'hadith_number': hadithNumber,
+    'arabic_text': arabicText,
+    'urdu_text': urduText,
+    'english_text': englishText,
     'grade': grade,
   };
 
@@ -75,7 +82,11 @@ class Bookmark {
   final int hadithId;
   final DateTime createdAt;
 
-  const Bookmark({required this.id, required this.hadithId, required this.createdAt});
+  const Bookmark({
+    required this.id,
+    required this.hadithId,
+    required this.createdAt,
+  });
 
   factory Bookmark.fromMap(Map<String, dynamic> m) => Bookmark(
     id: m['id'] as int,
@@ -90,9 +101,17 @@ class HadithCollection {
   final String name;
   final DateTime createdAt;
 
-  const HadithCollection({required this.id, required this.name, required this.createdAt});
+  const HadithCollection({
+    required this.id,
+    required this.name,
+    required this.createdAt,
+  });
 
-  Map<String, dynamic> toMap() => {'id': id, 'name': name, 'created_at': createdAt.toIso8601String()};
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'name': name,
+    'created_at': createdAt.toIso8601String(),
+  };
 
   factory HadithCollection.fromMap(Map<String, dynamic> m) => HadithCollection(
     id: m['id'] as int,
@@ -109,8 +128,13 @@ class Note {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  const Note({required this.id, required this.hadithId, required this.content,
-    required this.createdAt, required this.updatedAt});
+  const Note({
+    required this.id,
+    required this.hadithId,
+    required this.content,
+    required this.createdAt,
+    required this.updatedAt,
+  });
 
   factory Note.fromMap(Map<String, dynamic> m) => Note(
     id: m['id'] as int,
@@ -128,8 +152,12 @@ class ReadingProgress {
   final int hadithIndex;
   final DateTime lastReadAt;
 
-  const ReadingProgress({required this.id, required this.chapterId,
-    required this.hadithIndex, required this.lastReadAt});
+  const ReadingProgress({
+    required this.id,
+    required this.chapterId,
+    required this.hadithIndex,
+    required this.lastReadAt,
+  });
 
   factory ReadingProgress.fromMap(Map<String, dynamic> m) => ReadingProgress(
     id: m['id'] as int,

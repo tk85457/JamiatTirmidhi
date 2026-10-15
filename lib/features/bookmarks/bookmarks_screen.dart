@@ -8,7 +8,9 @@ import '../settings/settings_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 
-final bookmarkedHadithsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+final bookmarkedHadithsProvider = FutureProvider<List<Map<String, dynamic>>>((
+  ref,
+) async {
   final repo = ref.watch(hadithRepositoryProvider);
   return repo.getBookmarkedHadithsWithChapter();
 });
@@ -23,16 +25,17 @@ class BookmarksScreen extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bookmarks'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Bookmarks'), centerTitle: true),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(bookmarkedHadithsProvider);
         },
         child: bookmarksAsync.when(
-          loading: () => Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColor)),
+          loading: () => Center(
+            child: CircularProgressIndicator(
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
           error: (e, _) => Center(child: Text('Error: $e')),
           data: (rows) {
             if (rows.isEmpty) {
@@ -40,57 +43,88 @@ class BookmarksScreen extends ConsumerWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(12),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 40),
-                      decoration: BoxDecoration(
-                        color: isDark ? AppTheme.cardDark : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
+                    child:
+                        Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 40,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? AppTheme.cardDark
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(
+                                      alpha: isDark ? 0.2 : 0.04,
+                                    ),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  Container(
+                                        padding: const EdgeInsets.all(24),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(
+                                            context,
+                                          ).primaryColor.withValues(alpha: 0.1),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.bookmark_outline,
+                                          size: 64,
+                                          color: Theme.of(context).primaryColor,
+                                        ),
+                                      )
+                                      .animate(
+                                        onPlay: (controller) =>
+                                            controller.repeat(reverse: true),
+                                      )
+                                      .scale(
+                                        begin: const Offset(1, 1),
+                                        end: const Offset(1.05, 1.05),
+                                        duration: 1500.ms,
+                                        curve: Curves.easeInOut,
+                                      ),
+                                  const SizedBox(height: 24),
+                                  Text(
+                                    'No Bookmarks Yet',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark
+                                          ? Colors.grey.shade300
+                                          : Colors.grey.shade800,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Tap the bookmark icon on any hadith\nto save it here for quick access.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      height: 1.4,
+                                      color: isDark
+                                          ? Colors.grey.shade400
+                                          : Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                            .animate()
+                            .fadeIn(duration: 500.ms)
+                            .slideY(
+                              begin: 0.1,
+                              end: 0,
+                              duration: 500.ms,
+                              curve: Curves.easeOut,
                             ),
-                            child: Icon(
-                              Icons.bookmark_outline,
-                              size: 64,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                           .scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05), duration: 1500.ms, curve: Curves.easeInOut),
-                          const SizedBox(height: 24),
-                          Text(
-                            'No Bookmarks Yet',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.grey.shade300 : Colors.grey.shade800,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Tap the bookmark icon on any hadith\nto save it here for quick access.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 15,
-                              height: 1.4,
-                              color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.1, end: 0, duration: 500.ms, curve: Curves.easeOut),
                   ),
                 ],
               );
@@ -132,9 +166,14 @@ class BookmarksScreen extends ConsumerWidget {
                   child: InkWell(
                     onTap: () async {
                       final repo = ref.read(hadithRepositoryProvider);
-                      final hIndex = await repo.getHadithIndexWithinChapter(hadith.chapterId, hadith.hadithNumber);
+                      final hIndex = await repo.getHadithIndexWithinChapter(
+                        hadith.chapterId,
+                        hadith.hadithNumber,
+                      );
                       if (context.mounted) {
-                        context.push('/home/chapter/${hadith.chapterId}?startIndex=$hIndex');
+                        context.push(
+                          '/home/chapter/${hadith.chapterId}?startIndex=$hIndex',
+                        );
                       }
                     },
                     borderRadius: BorderRadius.circular(12),
@@ -146,7 +185,9 @@ class BookmarksScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                            color: Colors.black.withValues(
+                              alpha: isDark ? 0.2 : 0.04,
+                            ),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
@@ -159,9 +200,14 @@ class BookmarksScreen extends ConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                                  color: Theme.of(
+                                    context,
+                                  ).primaryColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
@@ -173,7 +219,11 @@ class BookmarksScreen extends ConsumerWidget {
                                   ),
                                 ),
                               ),
-                              Icon(Icons.bookmark, color: Theme.of(context).primaryColor, size: 20),
+                              Icon(
+                                Icons.bookmark,
+                                color: Theme.of(context).primaryColor,
+                                size: 20,
+                              ),
                             ],
                           ),
                           if (chapterTitle.isNotEmpty) ...[
@@ -188,7 +238,9 @@ class BookmarksScreen extends ConsumerWidget {
                                 settings.urduFontFamily,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
+                                color: Theme.of(
+                                  context,
+                                ).primaryColor.withValues(alpha: 0.8),
                               ),
                             ),
                           ],
@@ -200,17 +252,31 @@ class BookmarksScreen extends ConsumerWidget {
                             style: GoogleFonts.getFont(
                               settings.englishFontFamily,
                               fontSize: 13,
-                              color: AppTheme.getFontColor(settings.englishFontColor, isDark) ?? (isDark ? Colors.grey.shade300 : Colors.grey.shade700),
+                              color:
+                                  AppTheme.getFontColor(
+                                    settings.englishFontColor,
+                                    isDark,
+                                  ) ??
+                                  (isDark
+                                      ? Colors.grey.shade300
+                                      : Colors.grey.shade700),
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Sunan Ibn Majah',
-                          style: TextStyle(fontSize: 11, color: isDark ? Colors.white60 : Colors.grey.shade500, fontStyle: FontStyle.italic),
-                        ),
-                      ],
+                            'Jami at-Tirmidhi',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isDark
+                                  ? Colors.white60
+                                  : Colors.grey.shade500,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  )).animate().fadeIn(delay: (80 * index).ms).slideX(begin: 0.05, end: 0),
+                  ).animate().fadeIn(delay: (80 * index).ms).slideX(begin: 0.05, end: 0),
                 );
               },
             );

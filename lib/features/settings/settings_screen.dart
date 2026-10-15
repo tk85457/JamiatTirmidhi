@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../theme/app_theme.dart';
+import '../../core/ads/ad_service.dart';
+import '../../core/services/in_app_review_service.dart';
 import 'settings_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -12,10 +14,30 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  final _arabicFonts = ['AlQalam', 'Muhammadi', 'PDMS Saleem', 'NooreHuda', 'NooreHira'];
+  final _arabicFonts = [
+    'AlQalam',
+    'Muhammadi',
+    'PDMS Saleem',
+    'NooreHuda',
+    'NooreHira',
+  ];
   final _urduFonts = ['Nastaleeq', 'Mehr', 'TypeSetting', 'PDMS Saleem'];
-  final _englishFonts = ['Inter', 'Rubik', 'RubikMedium', 'OpenSans', 'Montserrat', 'Roboto', 'Google Sans Regular'];
-  final _fontColors = ['Default', 'Black', 'Dark Brown', 'Dark Blue', 'Dark Green'];
+  final _englishFonts = [
+    'Inter',
+    'Rubik',
+    'RubikMedium',
+    'OpenSans',
+    'Montserrat',
+    'Roboto',
+    'Google Sans Regular',
+  ];
+  final _fontColors = [
+    'Default',
+    'Black',
+    'Dark Brown',
+    'Dark Blue',
+    'Dark Green',
+  ];
   final _alignments = ['Right', 'Center', 'Left'];
 
   @override
@@ -25,58 +47,124 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Settings'), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             // ─── General Section ───
             _buildSectionCard(isDark, 'General', [
-              _buildDropdownRow(isDark, 'Theme', settings.isDarkMode ? 'Dark' : settings.uiColor, [settings.uiColor, 'Dark'], (v) {
-                notifier.updateTheme(v == 'Dark');
-              }),
+              _buildDropdownRow(
+                isDark,
+                'Theme',
+                settings.isDarkMode ? 'Dark' : settings.uiColor,
+                [settings.uiColor, 'Dark'],
+                (v) {
+                  notifier.updateTheme(v == 'Dark');
+                },
+              ),
               const SizedBox(height: 12),
-              _buildDropdownRow(isDark, 'Arabic', settings.showArabic ? 'Show' : 'Hide', ['Show', 'Hide'], (v) {
-                notifier.toggleTranslation('Arabic', v == 'Show');
-              }),
+              _buildDropdownRow(
+                isDark,
+                'Arabic',
+                settings.showArabic ? 'Show' : 'Hide',
+                ['Show', 'Hide'],
+                (v) {
+                  notifier.toggleTranslation('Arabic', v == 'Show');
+                },
+              ),
               const SizedBox(height: 12),
-              _buildDropdownRow(isDark, 'Urdu', settings.showUrdu ? 'Show' : 'Hide', ['Show', 'Hide'], (v) {
-                notifier.toggleTranslation('Urdu', v == 'Show');
-              }),
+              _buildDropdownRow(
+                isDark,
+                'Urdu',
+                settings.showUrdu ? 'Show' : 'Hide',
+                ['Show', 'Hide'],
+                (v) {
+                  notifier.toggleTranslation('Urdu', v == 'Show');
+                },
+              ),
               const SizedBox(height: 12),
-              _buildDropdownRow(isDark, 'English', settings.showEnglish ? 'Show' : 'Hide', ['Show', 'Hide'], (v) {
-                notifier.toggleTranslation('English', v == 'Show');
-              }),
+              _buildDropdownRow(
+                isDark,
+                'English',
+                settings.showEnglish ? 'Show' : 'Hide',
+                ['Show', 'Hide'],
+                (v) {
+                  notifier.toggleTranslation('English', v == 'Show');
+                },
+              ),
               const SizedBox(height: 12),
-              _buildDropdownRow(isDark, 'View', settings.viewType, ['All Ahadith', 'Translations Only'], (v) {
-                notifier.updateViewType(v!);
-              }),
+              _buildDropdownRow(
+                isDark,
+                'View',
+                settings.viewType,
+                ['All Ahadith', 'Translations Only'],
+                (v) {
+                  notifier.updateViewType(v!);
+                },
+              ),
               const SizedBox(height: 12),
-              _buildDropdownRow(isDark, 'Title Language', settings.titleLanguage, ['Urdu', 'English', 'Arabic'], (v) {
-                notifier.updateTitleLanguage(v!);
-              }),
+              _buildDropdownRow(
+                isDark,
+                'Title Language',
+                settings.titleLanguage,
+                ['Urdu', 'English', 'Arabic'],
+                (v) {
+                  notifier.updateTitleLanguage(v!);
+                },
+              ),
               const SizedBox(height: 12),
-              _buildDropdownRow(isDark, 'UI Color', settings.uiColor, ['Green', 'Blue', 'Purple', 'Orange', 'Dark Brown', 'Dark Blue'], (v) {
-                notifier.updateUiColor(v!);
-              }),
+              _buildDropdownRow(
+                isDark,
+                'UI Color',
+                settings.uiColor,
+                [
+                  'Rose',
+                  'Green',
+                  'Blue',
+                  'Purple',
+                  'Orange',
+                  'Dark Brown',
+                  'Dark Blue',
+                ],
+                (v) {
+                  notifier.updateUiColor(v!);
+                },
+              ),
             ]),
 
             // ─── Arabic Font Section ───
             _buildSectionCard(isDark, 'Arabic Font', [
-              _buildDropdownRow(isDark, 'Arabic Font', settings.arabicFontFamily, _arabicFonts, (v) {
-                notifier.updateFontFamily('Arabic', v!);
-              }),
+              _buildDropdownRow(
+                isDark,
+                'Arabic Font',
+                settings.arabicFontFamily,
+                _arabicFonts,
+                (v) {
+                  notifier.updateFontFamily('Arabic', v!);
+                },
+              ),
               const SizedBox(height: 12),
-              _buildFontSizeRow(isDark, 'Font Size', settings.arabicFontSize, 16, 40, (v) {
-                notifier.updateFontSize('Arabic', v);
-              }),
+              _buildFontSizeRow(
+                isDark,
+                'Font Size',
+                settings.arabicFontSize,
+                16,
+                40,
+                (v) {
+                  notifier.updateFontSize('Arabic', v);
+                },
+              ),
               const SizedBox(height: 12),
-              _buildDropdownRow(isDark, 'Font Color', settings.arabicFontColor, _fontColors, (v) {
-                notifier.updateFontColor('Arabic', v!);
-              }),
+              _buildDropdownRow(
+                isDark,
+                'Font Color',
+                settings.arabicFontColor,
+                _fontColors,
+                (v) {
+                  notifier.updateFontColor('Arabic', v!);
+                },
+              ),
               const SizedBox(height: 24),
               // Arabic Preview
               Text(
@@ -87,28 +175,56 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   settings.arabicFontFamily,
                   fontSize: settings.arabicFontSize,
                   height: 1.8,
-                  color: AppTheme.getFontColor(settings.arabicFontColor, isDark),
+                  color: AppTheme.getFontColor(
+                    settings.arabicFontColor,
+                    isDark,
+                  ),
                 ),
               ),
             ]),
 
             // ─── Urdu Font Section ───
             _buildSectionCard(isDark, 'Urdu Font', [
-              _buildDropdownRow(isDark, 'Urdu Font', settings.urduFontFamily, _urduFonts, (v) {
-                notifier.updateFontFamily('Urdu', v!);
-              }),
+              _buildDropdownRow(
+                isDark,
+                'Urdu Font',
+                settings.urduFontFamily,
+                _urduFonts,
+                (v) {
+                  notifier.updateFontFamily('Urdu', v!);
+                },
+              ),
               const SizedBox(height: 12),
-              _buildFontSizeRow(isDark, 'Font Size', settings.urduFontSize, 14, 36, (v) {
-                notifier.updateFontSize('Urdu', v);
-              }),
+              _buildFontSizeRow(
+                isDark,
+                'Font Size',
+                settings.urduFontSize,
+                14,
+                36,
+                (v) {
+                  notifier.updateFontSize('Urdu', v);
+                },
+              ),
               const SizedBox(height: 12),
-              _buildDropdownRow(isDark, 'Font Color', settings.urduFontColor, _fontColors, (v) {
-                notifier.updateFontColor('Urdu', v!);
-              }),
+              _buildDropdownRow(
+                isDark,
+                'Font Color',
+                settings.urduFontColor,
+                _fontColors,
+                (v) {
+                  notifier.updateFontColor('Urdu', v!);
+                },
+              ),
               const SizedBox(height: 12),
-              _buildDropdownRow(isDark, 'Alignment', settings.urduAlignment, _alignments, (v) {
-                notifier.updateUrduAlignment(v!);
-              }),
+              _buildDropdownRow(
+                isDark,
+                'Alignment',
+                settings.urduAlignment,
+                _alignments,
+                (v) {
+                  notifier.updateUrduAlignment(v!);
+                },
+              ),
               const SizedBox(height: 24),
               // Urdu Preview
               Text(
@@ -126,17 +242,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             // ─── English Font Section ───
             _buildSectionCard(isDark, 'English Font', [
-              _buildDropdownRow(isDark, 'English Font', settings.englishFontFamily, _englishFonts, (v) {
-                notifier.updateFontFamily('English', v!);
-              }),
+              _buildDropdownRow(
+                isDark,
+                'English Font',
+                settings.englishFontFamily,
+                _englishFonts,
+                (v) {
+                  notifier.updateFontFamily('English', v!);
+                },
+              ),
               const SizedBox(height: 12),
-              _buildFontSizeRow(isDark, 'Font Size', settings.englishFontSize, 12, 32, (v) {
-                notifier.updateFontSize('English', v);
-              }),
+              _buildFontSizeRow(
+                isDark,
+                'Font Size',
+                settings.englishFontSize,
+                12,
+                32,
+                (v) {
+                  notifier.updateFontSize('English', v);
+                },
+              ),
               const SizedBox(height: 12),
-              _buildDropdownRow(isDark, 'Font Color', settings.englishFontColor, _fontColors, (v) {
-                notifier.updateFontColor('English', v!);
-              }),
+              _buildDropdownRow(
+                isDark,
+                'Font Color',
+                settings.englishFontColor,
+                _fontColors,
+                (v) {
+                  notifier.updateFontColor('English', v!);
+                },
+              ),
               const SizedBox(height: 24),
               // English Preview
               Text(
@@ -145,8 +280,80 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 style: AppTheme.safeGetFont(
                   settings.englishFontFamily,
                   fontSize: settings.englishFontSize,
-                  color: AppTheme.getFontColor(settings.englishFontColor, isDark),
+                  color: AppTheme.getFontColor(
+                    settings.englishFontColor,
+                    isDark,
+                  ),
                 ),
+              ),
+            ]),
+
+            // ─── Support & Feedback Section ───
+            _buildSectionCard(isDark, 'Support & Feedback', [
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(
+                  Icons.star_rounded,
+                  color: Colors.amber,
+                  size: 28,
+                ),
+                title: Text(
+                  'Rate this App',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.grey.shade300 : AppTheme.textDark,
+                  ),
+                ),
+                subtitle: Text(
+                  'Rate us on Google Play to support the project',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                  ),
+                ),
+                trailing: const Icon(Icons.chevron_right, size: 20),
+                onTap: () async {
+                  await InAppReviewService.triggerManualReview(appName: "Jami' at-Tirmidhi");
+                },
+              ),
+              FutureBuilder<bool>(
+                future: AdService.isPrivacyOptionsRequired(),
+                builder: (context, snapshot) {
+                  if (snapshot.data != true) return const SizedBox.shrink();
+                  return Column(
+                    children: [
+                      const Divider(height: 24),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(
+                          Icons.privacy_tip_outlined,
+                          color: Colors.teal,
+                          size: 26,
+                        ),
+                        title: Text(
+                          'Ad Privacy Settings',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.grey.shade300 : AppTheme.textDark,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'Change or update your advertising consent choices',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                          ),
+                        ),
+                        trailing: const Icon(Icons.chevron_right, size: 20),
+                        onTap: () async {
+                          await AdService.showPrivacyOptionsForm();
+                        },
+                      ),
+                    ],
+                  );
+                },
               ),
             ]),
           ],
@@ -162,7 +369,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.cardDark : Colors.white,
-        border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
+        border: Border.all(
+          color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -186,14 +395,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   TextAlign _getAlignment(String alignment) {
     switch (alignment) {
-      case 'Right': return TextAlign.right;
-      case 'Center': return TextAlign.center;
-      case 'Left': return TextAlign.left;
-      default: return TextAlign.right;
+      case 'Right':
+        return TextAlign.right;
+      case 'Center':
+        return TextAlign.center;
+      case 'Left':
+        return TextAlign.left;
+      default:
+        return TextAlign.right;
     }
   }
 
-  Widget _buildDropdownRow(bool isDark, String label, String value, List<String> options, ValueChanged<String?> onChanged) {
+  Widget _buildDropdownRow(
+    bool isDark,
+    String label,
+    String value,
+    List<String> options,
+    ValueChanged<String?> onChanged,
+  ) {
     return Row(
       children: [
         SizedBox(
@@ -211,7 +430,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              border: Border.all(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+              border: Border.all(
+                color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+              ),
               borderRadius: BorderRadius.circular(8),
               color: isDark ? AppTheme.cardDark : Colors.white,
             ),
@@ -224,10 +445,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   fontSize: 14,
                   color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
                 ),
-                items: options.map((opt) => DropdownMenuItem(
-                  value: opt,
-                  child: Text(opt, textAlign: TextAlign.center),
-                )).toList(),
+                items: options
+                    .map(
+                      (opt) => DropdownMenuItem(
+                        value: opt,
+                        child: Text(opt, textAlign: TextAlign.center),
+                      ),
+                    )
+                    .toList(),
                 onChanged: onChanged,
               ),
             ),
@@ -237,7 +462,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  Widget _buildFontSizeRow(bool isDark, String label, double value, double min, double max, ValueChanged<double> onChanged) {
+  Widget _buildFontSizeRow(
+    bool isDark,
+    String label,
+    double value,
+    double min,
+    double max,
+    ValueChanged<double> onChanged,
+  ) {
     return Row(
       children: [
         SizedBox(
@@ -255,7 +487,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              border: Border.all(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+              border: Border.all(
+                color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+              ),
               borderRadius: BorderRadius.circular(8),
               color: isDark ? AppTheme.cardDark : Colors.white,
             ),
@@ -265,8 +499,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   onTap: value > min ? () => onChanged(value - 1) : null,
                   child: Padding(
                     padding: const EdgeInsets.all(4),
-                    child: Icon(Icons.remove, size: 18,
-                      color: value > min ? AppTheme.primaryGreen : Colors.grey),
+                    child: Icon(
+                      Icons.remove,
+                      size: 18,
+                      color: value > min ? AppTheme.primaryRose : Colors.grey,
+                    ),
                   ),
                 ),
                 Expanded(
@@ -275,7 +512,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+                      color: isDark
+                          ? Colors.grey.shade300
+                          : Colors.grey.shade700,
                     ),
                   ),
                 ),
@@ -283,8 +522,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   onTap: value < max ? () => onChanged(value + 1) : null,
                   child: Padding(
                     padding: const EdgeInsets.all(4),
-                    child: Icon(Icons.add, size: 18,
-                      color: value < max ? AppTheme.primaryGreen : Colors.grey),
+                    child: Icon(
+                      Icons.add,
+                      size: 18,
+                      color: value < max ? AppTheme.primaryRose : Colors.grey,
+                    ),
                   ),
                 ),
               ],

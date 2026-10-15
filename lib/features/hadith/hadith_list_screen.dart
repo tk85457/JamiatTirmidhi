@@ -73,7 +73,9 @@ class HadithListScreen extends ConsumerWidget {
             decoration: BoxDecoration(
               color: isDark ? AppTheme.cardDark : Colors.white,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(
+                color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+              ),
             ),
             child: Row(
               children: [
@@ -96,7 +98,7 @@ class HadithListScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                const Icon(Icons.search, color: Colors.blue),
+                Icon(Icons.search, color: Theme.of(context).primaryColor),
               ],
             ),
           ),

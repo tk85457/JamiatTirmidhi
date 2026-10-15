@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'isar_models.dart';
 import '../database/app_database.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class IsarService {
   static final IsarService instance = IsarService._init();
@@ -38,19 +39,26 @@ class IsarService {
         IsarReadingProgressSchema,
       ],
       directory: dir.path,
-      inspector: true,
+      inspector: kDebugMode,
     );
 
     _isar = isar;
-    
+
     // Initial sync check
-    final count = await isar.isarHadiths.count();
-    if (count == 0) {
-      // Run sync in background without blocking the "init" return if possible, 
-      // but here we actually want to finish the Isar open quickly.
-      _syncFromSqlite(isar).then((_) {
+    final prefs = await SharedPreferences.getInstance();
+    final isSyncCompleted = prefs.getBool('isar_sync_v1_completed') ?? false;
+
+    if (!isSyncCompleted) {
+      _syncFromSqlite(isar).then((_) async {
+        await prefs.setBool('isar_sync_v1_completed', true);
         _ready = true;
         _isInitializing = false;
+        syncProgress.value = 1.0;
+      }).catchError((e) {
+        debugPrint('Error syncing SQLite to Isar: $e');
+        _ready = true;
+        _isInitializing = false;
+        syncProgress.value = 1.0;
       });
     } else {
       _ready = true;
@@ -83,12 +91,17 @@ class IsarService {
       await isar.isarChapters.putAll(isarChapters);
     });
 
-    // 2. Sync Hadiths (in batches to avoid memory issues)
-    const batchSize = 1000;
+    // Yield to UI
+    await Future.delayed(const Duration(milliseconds: 20));
+
+    // 2. Sync Hadiths in smooth batches to prevent ANRs
+    const batchSize = 250;
     int offset = 0;
-    final totalHadithsRaw = await db.rawQuery('SELECT COUNT(*) as c FROM hadiths');
+    final totalHadithsRaw = await db.rawQuery(
+      'SELECT COUNT(*) as c FROM hadiths',
+    );
     final totalHadiths = totalHadithsRaw.first['c'] as int;
-    
+
     while (true) {
       final hadithsRaw = await db.query(
         'hadiths',
@@ -107,15 +120,19 @@ class IsarService {
               ..urduText = e['urdu_text'] as String
               ..englishText = e['english_text'] as String,
           )
-          .toList();
+          .toList(growable: false);
 
       await isar.writeTxn(() async {
         await isar.isarHadiths.putAll(isarHadiths);
       });
       offset += batchSize;
-      
+
       // Update progress
-      syncProgress.value = (offset / (totalHadiths > 0 ? totalHadiths : 1)).clamp(0.0, 1.0);
+      syncProgress.value = (offset / (totalHadiths > 0 ? totalHadiths : 1))
+          .clamp(0.0, 1.0);
+
+      // Crucial: yield to the UI isolate so frames render and user inputs are processed
+      await Future.delayed(const Duration(milliseconds: 20));
     }
 
     // 3. Sync User Data (Bookmarks)

@@ -28,18 +28,13 @@ class _ShareImageScreenState extends ConsumerState<ShareImageScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Share Hadith'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Share Hadith'), centerTitle: true),
       body: Column(
         children: [
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
-              child: Screenshots(
-                child: _buildImageCard(isDark),
-              ),
+              child: _buildScreenshotArea(child: _buildImageCard(isDark)),
             ),
           ),
           Container(
@@ -51,7 +46,7 @@ class _ShareImageScreenState extends ConsumerState<ShareImageScreen> {
                   color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, -2),
-                )
+                ),
               ],
             ),
             child: SafeArea(
@@ -60,13 +55,29 @@ class _ShareImageScreenState extends ConsumerState<ShareImageScreen> {
                 child: ElevatedButton.icon(
                   onPressed: _isExporting ? null : _shareImage,
                   icon: _isExporting
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Icon(Icons.share, color: Colors.white),
-                  label: Text(_isExporting ? 'Generating...' : 'Share Image', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                  label: Text(
+                    _isExporting ? 'Generating...' : 'Share Image',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Theme.of(context).primaryColor,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ),
@@ -77,11 +88,8 @@ class _ShareImageScreenState extends ConsumerState<ShareImageScreen> {
     );
   }
 
-  Widget Screenshots({required Widget child}) {
-    return Screenshot(
-      controller: _screenshotController,
-      child: child,
-    );
+  Widget _buildScreenshotArea({required Widget child}) {
+    return Screenshot(controller: _screenshotController, child: child);
   }
 
   Widget _buildImageCard(bool isDark) {
@@ -113,7 +121,10 @@ class _ShareImageScreenState extends ConsumerState<ShareImageScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             decoration: BoxDecoration(
               color: primaryColor,
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -122,10 +133,24 @@ class _ShareImageScreenState extends ConsumerState<ShareImageScreen> {
                   children: [
                     Icon(Icons.menu_book, color: Colors.white, size: 20),
                     SizedBox(width: 8),
-                    Text('Sunan Ibn Majah', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(
+                      'Jami at-Tirmidhi',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                   ],
                 ),
-                Text('Hadith #${widget.hadith.hadithNumber}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(
+                  'Hadith #${widget.hadith.hadithNumber}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
               ],
             ),
           ),
@@ -135,12 +160,16 @@ class _ShareImageScreenState extends ConsumerState<ShareImageScreen> {
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: cardColor,
-              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(16), bottomRight: Radius.circular(16)),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (widget.chapterTitle != null && widget.chapterTitle!.isNotEmpty) ...[
+                if (widget.chapterTitle != null &&
+                    widget.chapterTitle!.isNotEmpty) ...[
                   Text(
                     widget.chapterTitle!,
                     textAlign: TextAlign.center,
@@ -156,14 +185,17 @@ class _ShareImageScreenState extends ConsumerState<ShareImageScreen> {
                   const SizedBox(height: 16),
                 ],
 
-                if (settings.showArabic && widget.hadith.arabicText.isNotEmpty) ...[
+                if (settings.showArabic &&
+                    widget.hadith.arabicText.isNotEmpty) ...[
                   Text(
                     widget.hadith.arabicText,
                     textAlign: TextAlign.center,
                     textDirection: TextDirection.rtl,
                     style: AppTheme.safeGetFont(
                       settings.arabicFontFamily,
-                      color: isDark ? Colors.greenAccent.shade100 : primaryColor,
+                      color: isDark
+                          ? Colors.greenAccent.shade100
+                          : primaryColor,
                       fontSize: settings.arabicFontSize,
                       height: 1.8,
                     ),
@@ -186,7 +218,8 @@ class _ShareImageScreenState extends ConsumerState<ShareImageScreen> {
                   const SizedBox(height: 24),
                 ],
 
-                if (settings.showEnglish && widget.hadith.englishText.isNotEmpty) ...[
+                if (settings.showEnglish &&
+                    widget.hadith.englishText.isNotEmpty) ...[
                   Text(
                     widget.hadith.englishText,
                     textAlign: TextAlign.left,
@@ -209,7 +242,7 @@ class _ShareImageScreenState extends ConsumerState<ShareImageScreen> {
                     Icon(Icons.verified, color: primaryColor, size: 16),
                     const SizedBox(width: 6),
                     Text(
-                      'Shared via Sunan Ibn Majah App',
+                      'Shared via Jami at-Tirmidhi app',
                       style: TextStyle(
                         color: Colors.grey.shade500,
                         fontSize: 12,
@@ -235,20 +268,38 @@ class _ShareImageScreenState extends ConsumerState<ShareImageScreen> {
 
       if (kIsWeb) {
         // For web, use Share.shareXFiles with memory bytes
-        final xFile = XFile.fromData(image, mimeType: 'image/png', name: 'hadith_${widget.hadith.hadithNumber}.png');
-        await Share.shareXFiles([xFile], text: 'Hadith #${widget.hadith.hadithNumber} from Sunan Ibn Majah');
+        final xFile = XFile.fromData(
+          image,
+          mimeType: 'image/png',
+          name: 'hadith_${widget.hadith.hadithNumber}.png',
+        );
+        await SharePlus.instance.share(
+          ShareParams(
+            files: [xFile],
+            text: 'Hadith #${widget.hadith.hadithNumber} from Jami at-Tirmidhi',
+          ),
+        );
       } else {
         // For mobile/desktop, save to temp dir first
         final directory = await getTemporaryDirectory();
-        final imagePath = await File('${directory.path}/hadith_${widget.hadith.hadithNumber}.png').create();
+        final imagePath = await File(
+          '${directory.path}/hadith_${widget.hadith.hadithNumber}.png',
+        ).create();
         await imagePath.writeAsBytes(image);
 
         final xFile = XFile(imagePath.path);
-        await Share.shareXFiles([xFile], text: 'Hadith #${widget.hadith.hadithNumber} from Sunan Ibn Majah');
+        await SharePlus.instance.share(
+          ShareParams(
+            files: [xFile],
+            text: 'Hadith #${widget.hadith.hadithNumber} from Jami at-Tirmidhi',
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error sharing image: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error sharing image: $e')));
       }
     } finally {
       if (mounted) setState(() => _isExporting = false);

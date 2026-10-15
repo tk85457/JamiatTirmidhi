@@ -17,30 +17,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _slides = const [
     _Slide(
       icon: Icons.menu_book_rounded,
-      title: 'سنن ابن ماجہ',
-      subtitle: 'Sunan Ibn Majah',
-      description: 'The most authentic collection of Hadith, compiled by Imam Ibn Majah (rahimahullah). Over 4,000+ hadiths in Arabic, Urdu & English.',
-      color: Color(0xFF1B5E20),
+      title: 'جامع الترمذی',
+      subtitle: 'Jami at-Tirmidhi',
+      description:
+          'An essential collection of Hadith, compiled by Imam at-Tirmidhi (rahimahullah). Selected for its deep scholarly analysis and categorization.',
+      color: Color(0xFF7A1630), // Branded Persian Rose
     ),
     _Slide(
       icon: Icons.search_rounded,
       title: 'تلاش کریں',
       subtitle: 'Powerful Search',
-      description: 'Search hadiths by keyword, narrator, or topic. Find exactly what you need with filters for language & match type.',
+      description:
+          'Search hadiths by keyword, narrator, or topic. Find exactly what you need with filters for language & match type.',
       color: Color(0xFF00796B),
     ),
     _Slide(
       icon: Icons.bookmark_rounded,
       title: 'محفوظ کریں',
       subtitle: 'Bookmarks & Collections',
-      description: 'Bookmark your favourite hadiths, create custom collections, and add personal notes. Your data stays safe.',
+      description:
+          'Bookmark your favourite hadiths, create custom collections, and add personal notes. Your data stays safe.',
       color: Color(0xFF5D4037),
     ),
     _Slide(
       icon: Icons.auto_awesome,
       title: 'آج کی حدیث',
       subtitle: 'Daily Hadith & More',
-      description: 'Get a new hadith every day, track your chapter progress, discover random hadiths, and share beautiful hadith cards.',
+      description:
+          'Get a new hadith every day, track your chapter progress, discover random hadiths, and share beautiful hadith cards.',
       color: Color(0xFF1565C0),
     ),
   ];
@@ -72,9 +76,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 padding: const EdgeInsets.all(16),
                 child: TextButton(
                   onPressed: _onDone,
-                  child: Text(
-                    'Skip',
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                  child: Builder(
+                    builder: (context) {
+                      final isDark = Theme.of(context).brightness == Brightness.dark;
+                      return Text(
+                        'Skip',
+                        style: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.grey.shade600,
+                          fontSize: 16,
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -95,88 +107,137 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(
-                              width: 180,
-                              height: 180,
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  if (index == 0)
-                                    Container(
-                                      width: 160,
-                                      height: 160,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(color: slide.color.withValues(alpha: 0.3), width: 4),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: slide.color.withValues(alpha: 0.2),
-                                            blurRadius: 30,
-                                            spreadRadius: 8,
-                                          ),
-                                        ],
-                                      ),
-                                      child: ClipOval(
-                                        child: Image.asset(
-                                          'assets/icon/icon.png',
+                                  width: 180,
+                                  height: 180,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      if (index == 0)
+                                        Container(
                                           width: 160,
                                           height: 160,
-                                          fit: BoxFit.contain, // Changed to contain for perfect fit
-                                        ),
-                                      ),
-                                    )
-                                  else
-                                    Container(
-                                      width: 160,
-                                      height: 160,
-                                      decoration: BoxDecoration(
-                                        color: slide.color.withValues(alpha: 0.1),
-                                        shape: BoxShape.circle,
-                                        border: Border.all(color: slide.color.withValues(alpha: 0.3), width: 4),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: slide.color.withValues(alpha: 0.15),
-                                            blurRadius: 30,
-                                            spreadRadius: 8,
-                                          ),
-                                        ],
-                                      ),
-                                      child: Icon(slide.icon, size: 80, color: slide.color),
-                                    ),
-                                  // Small feature badge in bottom-right (only for first slide where it makes sense as overlay)
-                                  if (index == 0)
-                                    Positioned(
-                                      bottom: 8,
-                                      right: 8,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                          color: slide.color,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(color: Colors.white, width: 3),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.2),
-                                              blurRadius: 8,
-                                              offset: const Offset(0, 3)
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: slide.color.withValues(
+                                                alpha: 0.3,
+                                              ),
+                                              width: 4,
                                             ),
-                                          ],
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: slide.color.withValues(
+                                                  alpha: 0.2,
+                                                ),
+                                                blurRadius: 30,
+                                                spreadRadius: 8,
+                                              ),
+                                            ],
+                                          ),
+                                          child: ClipOval(
+                                            child: Image.asset(
+                                              'assets/icon/icon_circle.webp',
+                                              width: 160,
+                                              height: 160,
+                                              fit: BoxFit
+                                                  .cover, // Full fit in circle
+                                            ),
+                                          ),
+                                        )
+                                      else
+                                        Container(
+                                          width: 160,
+                                          height: 160,
+                                          decoration: BoxDecoration(
+                                            color: slide.color.withValues(
+                                              alpha: 0.1,
+                                            ),
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: slide.color.withValues(
+                                                alpha: 0.3,
+                                              ),
+                                              width: 4,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: slide.color.withValues(
+                                                  alpha: 0.15,
+                                                ),
+                                                blurRadius: 30,
+                                                spreadRadius: 8,
+                                              ),
+                                            ],
+                                          ),
+                                          child: Icon(
+                                            slide.icon,
+                                            size: 80,
+                                            color: slide.color,
+                                          ),
                                         ),
-                                        child: Icon(slide.icon, size: 24, color: Colors.white),
-                                      ),
-                                    ).animate(delay: 600.ms).scale(duration: 400.ms, curve: Curves.easeOutBack),
-                                ],
-                              ),
-                            ).animate(key: ValueKey('icon_$index')).scale(duration: 700.ms, curve: Curves.easeOutBack),
+                                      // Small feature badge in bottom-right (only for first slide where it makes sense as overlay)
+                                      if (index == 0)
+                                        Positioned(
+                                              bottom: 8,
+                                              right: 8,
+                                              child: Container(
+                                                padding: const EdgeInsets.all(
+                                                  10,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: slide.color,
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: Colors.white,
+                                                    width: 3,
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black
+                                                          .withValues(
+                                                            alpha: 0.2,
+                                                          ),
+                                                      blurRadius: 8,
+                                                      offset: const Offset(
+                                                        0,
+                                                        3,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Icon(
+                                                  slide.icon,
+                                                  size: 24,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            )
+                                            .animate(delay: 600.ms)
+                                            .scale(
+                                              duration: 400.ms,
+                                              curve: Curves.easeOutBack,
+                                            ),
+                                    ],
+                                  ),
+                                )
+                                .animate(key: ValueKey('icon_$index'))
+                                .scale(
+                                  duration: 700.ms,
+                                  curve: Curves.easeOutBack,
+                                ),
                             const SizedBox(height: 32),
                             Text(
-                              slide.title,
-                              textDirection: TextDirection.rtl,
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: slide.color,
-                              ),
-                            ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.3, end: 0),
+                                  slide.title,
+                                  textDirection: TextDirection.rtl,
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: slide.color,
+                                  ),
+                                )
+                                .animate()
+                                .fadeIn(delay: 200.ms)
+                                .slideY(begin: 0.3, end: 0),
                             const SizedBox(height: 8),
                             Text(
                               slide.subtitle,
@@ -193,7 +254,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               style: TextStyle(
                                 fontSize: 15,
                                 height: 1.6,
-                                color: Colors.grey.shade600,
+                                color: Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white70
+                                    : Colors.grey.shade600,
                               ),
                             ).animate().fadeIn(delay: 600.ms),
                           ],
@@ -221,7 +284,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         decoration: BoxDecoration(
                           color: _currentPage == index
                               ? _slides[_currentPage].color
-                              : Colors.grey.shade300,
+                              : (Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.grey.shade600
+                                  : Colors.grey.shade300),
                           borderRadius: BorderRadius.circular(4),
                         ),
                       );
@@ -242,16 +307,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _slides[_currentPage].color,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                       elevation: 4,
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          _currentPage == _slides.length - 1 ? 'شروع کریں' : 'اگلا',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          _currentPage == _slides.length - 1
+                              ? 'شروع کریں'
+                              : 'اگلا',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(width: 8),
                         Icon(

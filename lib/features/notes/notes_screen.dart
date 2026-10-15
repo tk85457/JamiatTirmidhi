@@ -5,7 +5,9 @@ import '../../theme/app_theme.dart';
 import '../../data/repositories/hadith_repository.dart';
 import 'package:go_router/go_router.dart';
 
-final allNotesWithInfoProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+final allNotesWithInfoProvider = FutureProvider<List<Map<String, dynamic>>>((
+  ref,
+) async {
   final repo = ref.watch(hadithRepositoryProvider);
   return repo.getNotesWithHadithInfo();
 });
@@ -19,74 +21,103 @@ class NotesScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Notes'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('My Notes'), centerTitle: true),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(allNotesWithInfoProvider);
         },
         child: notesAsync.when(
-          loading: () => Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColor)),
+          loading: () => Center(
+            child: CircularProgressIndicator(
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
           error: (e, _) => Center(child: Text('Error: $e')),
           data: (noteRows) {
             if (noteRows.isEmpty) {
               return ListView(
                 children: [
                   Center(
-                    child: Container(
-                      margin: const EdgeInsets.all(32),
-                      padding: const EdgeInsets.all(32),
-                      decoration: BoxDecoration(
-                        color: isDark ? AppTheme.cardDark : Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
+                    child:
+                        Container(
+                              margin: const EdgeInsets.all(32),
+                              padding: const EdgeInsets.all(32),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? AppTheme.cardDark
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(
+                                      alpha: isDark ? 0.3 : 0.06,
+                                    ),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                        padding: const EdgeInsets.all(24),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(
+                                            context,
+                                          ).primaryColor.withValues(alpha: 0.1),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.note_alt_outlined,
+                                          size: 72,
+                                          color: Theme.of(context).primaryColor,
+                                        ),
+                                      )
+                                      .animate(
+                                        onPlay: (controller) =>
+                                            controller.repeat(reverse: true),
+                                      )
+                                      .scale(
+                                        begin: const Offset(1, 1),
+                                        end: const Offset(1.05, 1.05),
+                                        duration: 1500.ms,
+                                        curve: Curves.easeInOut,
+                                      ),
+                                  const SizedBox(height: 24),
+                                  Text(
+                                    'No Notes Yet',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark
+                                          ? Colors.grey.shade300
+                                          : Colors.grey.shade800,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Add personal notes while reading hadiths.\nTap the note icon on any hadith to start.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      height: 1.4,
+                                      color: isDark
+                                          ? Colors.grey.shade400
+                                          : Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                            .animate()
+                            .fadeIn(duration: 500.ms)
+                            .slideY(
+                              begin: 0.1,
+                              end: 0,
+                              duration: 500.ms,
+                              curve: Curves.easeOut,
                             ),
-                            child: Icon(
-                              Icons.note_alt_outlined,
-                              size: 72,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                           .scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05), duration: 1500.ms, curve: Curves.easeInOut),
-                          const SizedBox(height: 24),
-                          Text(
-                            'No Notes Yet',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.grey.shade300 : Colors.grey.shade800,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Add personal notes while reading hadiths.\nTap the note icon on any hadith to start.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 15,
-                              height: 1.4,
-                              color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.1, end: 0, duration: 500.ms, curve: Curves.easeOut),
                   ),
                 ],
               );
@@ -102,8 +133,8 @@ class NotesScreen extends ConsumerWidget {
                 final content = row['content'] as String;
                 final updatedAt = DateTime.parse(row['updated_at'] as String);
                 final hadithNumber = row['hadith_number']?.toString() ?? '?';
-                final hadithPreview = (row['hadith_preview'] as String? ?? '').toString();
-
+                final hadithPreview = (row['hadith_preview'] as String? ?? '')
+                    .toString();
 
                 return Dismissible(
                   key: Key('note_$noteId'),
@@ -128,9 +159,14 @@ class NotesScreen extends ConsumerWidget {
                       final repo = ref.read(hadithRepositoryProvider);
                       final hadith = await repo.getHadithById(hadithId);
                       if (hadith != null) {
-                        final hIndex = await repo.getHadithIndexWithinChapter(hadith.chapterId, hadith.hadithNumber);
+                        final hIndex = await repo.getHadithIndexWithinChapter(
+                          hadith.chapterId,
+                          hadith.hadithNumber,
+                        );
                         if (context.mounted) {
-                          context.push('/home/chapter/${hadith.chapterId}?startIndex=$hIndex');
+                          context.push(
+                            '/home/chapter/${hadith.chapterId}?startIndex=$hIndex',
+                          );
                         }
                       }
                     },
@@ -143,7 +179,9 @@ class NotesScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                            color: Colors.black.withValues(
+                              alpha: isDark ? 0.2 : 0.04,
+                            ),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
@@ -156,9 +194,14 @@ class NotesScreen extends ConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                                  color: Theme.of(
+                                    context,
+                                  ).primaryColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
@@ -172,7 +215,12 @@ class NotesScreen extends ConsumerWidget {
                               ),
                               Text(
                                 _formatDate(updatedAt),
-                                style: TextStyle(fontSize: 11, color: isDark ? Colors.white60 : Colors.grey.shade500),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: isDark
+                                      ? Colors.white60
+                                      : Colors.grey.shade500,
+                                ),
                               ),
                             ],
                           ),
@@ -183,23 +231,33 @@ class NotesScreen extends ConsumerWidget {
                               width: double.infinity,
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: isDark ? Colors.grey.shade800.withValues(alpha: 0.5) : Colors.grey.shade50,
+                                color: isDark
+                                    ? Colors.grey.shade800.withValues(
+                                        alpha: 0.5,
+                                      )
+                                    : Colors.grey.shade50,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border(
                                   left: BorderSide(
-                                    color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
+                                    color: Theme.of(
+                                      context,
+                                    ).primaryColor.withValues(alpha: 0.5),
                                     width: 3,
                                   ),
                                 ),
                               ),
                               child: Text(
-                                hadithPreview.length > 100 ? '${hadithPreview.substring(0, 100)}...' : hadithPreview,
+                                hadithPreview.length > 100
+                                    ? '${hadithPreview.substring(0, 100)}...'
+                                    : hadithPreview,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontStyle: FontStyle.italic,
-                                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                                  color: isDark
+                                      ? Colors.grey.shade400
+                                      : Colors.grey.shade600,
                                   height: 1.4,
                                 ),
                               ),
@@ -210,7 +268,11 @@ class NotesScreen extends ConsumerWidget {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(Icons.edit_note, size: 18, color: Colors.amber.shade700),
+                              Icon(
+                                Icons.edit_note,
+                                size: 18,
+                                color: Colors.amber.shade700,
+                              ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -219,7 +281,9 @@ class NotesScreen extends ConsumerWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+                                    color: isDark
+                                        ? Colors.grey.shade300
+                                        : Colors.grey.shade700,
                                     height: 1.4,
                                   ),
                                 ),
@@ -240,7 +304,20 @@ class NotesScreen extends ConsumerWidget {
   }
 
   String _formatDate(DateTime date) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }

@@ -74,10 +74,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final settings = ref.watch(settingsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Search Hadith'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Search Hadith'), centerTitle: true),
       body: Column(
         children: [
           // Search Card
@@ -100,7 +97,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 // Search Field
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                    border: Border.all(
+                      color: isDark
+                          ? Colors.grey.shade700
+                          : Colors.grey.shade300,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -113,14 +114,24 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           onSubmitted: (_) => _performSearch(),
                           decoration: InputDecoration(
                             hintText: 'مطلوب الفاظ یہاں ٹائپ کریں',
-                            hintStyle: TextStyle(color: isDark ? Colors.grey.shade500 : Colors.grey.shade400),
+                            hintStyle: TextStyle(
+                              color: isDark
+                                  ? Colors.grey.shade500
+                                  : Colors.grey.shade400,
+                            ),
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                           ),
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.search, color: Theme.of(context).primaryColor),
+                        icon: Icon(
+                          Icons.search,
+                          color: Theme.of(context).primaryColor,
+                        ),
                         onPressed: _performSearch,
                       ),
                     ],
@@ -143,9 +154,19 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _buildFilterChip('Sahih Hadith Only', _sahihOnly, () => setState(() => _sahihOnly = true), isDark),
+                      _buildFilterChip(
+                        'Sahih Hadith Only',
+                        _sahihOnly,
+                        () => setState(() => _sahihOnly = true),
+                        isDark,
+                      ),
                       const SizedBox(width: 8),
-                      _buildFilterChip('All Hadith', !_sahihOnly, () => setState(() => _sahihOnly = false), isDark),
+                      _buildFilterChip(
+                        'All Hadith',
+                        !_sahihOnly,
+                        () => setState(() => _sahihOnly = false),
+                        isDark,
+                      ),
                     ],
                   ),
                 ).animate().fadeIn(delay: 200.ms),
@@ -154,9 +175,19 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 // Match Type
                 Row(
                   children: [
-                    _buildFilterChip('Partial Match', _partialMatch, () => setState(() => _partialMatch = true), isDark),
+                    _buildFilterChip(
+                      'Partial Match',
+                      _partialMatch,
+                      () => setState(() => _partialMatch = true),
+                      isDark,
+                    ),
                     const SizedBox(width: 8),
-                    _buildFilterChip('Exact Match', !_partialMatch, () => setState(() => _partialMatch = false), isDark),
+                    _buildFilterChip(
+                      'Exact Match',
+                      !_partialMatch,
+                      () => setState(() => _partialMatch = false),
+                      isDark,
+                    ),
                   ],
                 ).animate().fadeIn(delay: 300.ms),
                 const SizedBox(height: 12),
@@ -167,41 +198,66 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     TextButton(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('💡 Try searching by narrator name, keyword, or topic')),
+                          const SnackBar(
+                            content: Text(
+                              '💡 Try searching by narrator name, keyword, or topic',
+                            ),
+                          ),
                         );
                       },
-                      child: const Text('SEARCH TIPS', style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: const Text(
+                        'SEARCH TIPS',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     OutlinedButton.icon(
-                      onPressed: _performSearch,
-                      icon: const Icon(Icons.search, size: 18),
-                      label: const Text('SEARCH'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                    ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                     .shimmer(duration: 2.seconds, color: Theme.of(context).primaryColor.withValues(alpha: 0.2)),
+                          onPressed: _performSearch,
+                          icon: const Icon(Icons.search, size: 18),
+                          label: const Text('SEARCH'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Theme.of(context).primaryColor,
+                            side: BorderSide(
+                              color: Theme.of(context).primaryColor,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        )
+                        .animate(
+                          onPlay: (controller) =>
+                              controller.repeat(reverse: true),
+                        )
+                        .shimmer(
+                          duration: 2.seconds,
+                          color: Theme.of(
+                            context,
+                          ).primaryColor.withValues(alpha: 0.2),
+                        ),
                   ],
                 ).animate().fadeIn(delay: 400.ms),
               ],
             ),
           ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.05, end: 0),
-          
+
           // Indexing Status (if not ready)
           ValueListenableBuilder<double>(
             valueListenable: IsarService.instance.syncProgress,
             builder: (context, progress, child) {
               if (progress < 1.0) {
                 return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.amber.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+                    border: Border.all(
+                      color: Colors.amber.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Column(
                     children: [
@@ -210,18 +266,29 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           const SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.amber),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.amber,
+                            ),
                           ),
                           const SizedBox(width: 12),
                           const Expanded(
                             child: Text(
                               'Optimizing search index for first use...',
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.amber),
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.amber,
+                              ),
                             ),
                           ),
                           Text(
                             '${(progress * 100).toInt()}%',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.amber),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.amber,
+                            ),
                           ),
                         ],
                       ),
@@ -231,7 +298,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         child: LinearProgressIndicator(
                           value: progress,
                           backgroundColor: Colors.amber.withValues(alpha: 0.1),
-                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Colors.amber,
+                          ),
                           minHeight: 3,
                         ),
                       ),
@@ -246,182 +315,285 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           // Results
           Expanded(
             child: _isLoading && _results.isEmpty
-                ? Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColor))
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  )
                 : !_hasSearched
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.search, size: 64,
-                              color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
-                            const SizedBox(height: 12),
-                            Text('Search for hadiths above',
-                              style: TextStyle(color: Colors.grey.shade500)),
-                          ],
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search,
+                          size: 64,
+                          color: isDark
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade300,
                         ),
-                      )
-                    : _results.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.search_off, size: 64,
-                                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
-                                const SizedBox(height: 12),
-                                Text('No results found',
-                                  style: TextStyle(fontSize: 16, color: Colors.grey.shade500)),
-                                const SizedBox(height: 4),
-                                Text('Try different keywords',
-                                  style: TextStyle(fontSize: 13, color: Colors.grey.shade400)),
-                              ],
-                            ),
-                          )
-                        : Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        '${_results.length}${_hasMore ? '+' : ''} result${_results.length > 1 ? 's' : ''} found',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: Theme.of(context).primaryColor,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                        const SizedBox(height: 12),
+                        Text(
+                          'Search for hadiths above',
+                          style: TextStyle(
+                            color: isDark
+                                ? Colors.grey.shade400
+                                : Colors.grey.shade500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : _results.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search_off,
+                          size: 64,
+                          color: isDark
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade300,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'No results found',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Try different keywords',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey.shade400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Theme.of(
+                                  context,
+                                ).primaryColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                '${_results.length}${_hasMore ? '+' : ''} result${_results.length > 1 ? 's' : ''} found',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).primaryColor,
                                 ),
                               ),
-                              Expanded(
-                                child: ListView.builder(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                                  itemCount: _results.length + (_hasMore ? 1 : 0),
-                                  itemBuilder: (context, index) {
-                                    // Load More button
-                                    if (index == _results.length) {
-                                      return Padding(
-                                        padding: const EdgeInsets.all(16),
-                                        child: _isLoading
-                                          ? const Center(child: CircularProgressIndicator())
-                                          : OutlinedButton.icon(
-                                              onPressed: _loadMore,
-                                              icon: const Icon(Icons.expand_more),
-                                              label: const Text('Load More Results'),
-                                              style: OutlinedButton.styleFrom(
-                                                foregroundColor: Theme.of(context).primaryColor,
-                                                side: BorderSide(color: Theme.of(context).primaryColor),
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          itemCount: _results.length + (_hasMore ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            // Load More button
+                            if (index == _results.length) {
+                              return Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: _isLoading
+                                    ? const Center(
+                                        child: CircularProgressIndicator(),
+                                      )
+                                    : OutlinedButton.icon(
+                                        onPressed: _loadMore,
+                                        icon: const Icon(Icons.expand_more),
+                                        label: const Text('Load More Results'),
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: Theme.of(
+                                            context,
+                                          ).primaryColor,
+                                          side: BorderSide(
+                                            color: Theme.of(
+                                              context,
+                                            ).primaryColor,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
                                             ),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 12,
+                                          ),
+                                        ),
+                                      ),
+                              );
+                            }
+
+                            final hadith = _results[index];
+                            final query = _controller.text;
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? AppTheme.cardDark
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(
+                                      alpha: isDark ? 0.2 : 0.04,
+                                    ),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(12),
+                                  onTap: () async {
+                                    final repo = ref.read(
+                                      hadithRepositoryProvider,
+                                    );
+                                    final hIndex = await repo.getHadithIndex(
+                                      hadith.chapterId,
+                                      hadith.hadithNumber,
+                                    );
+                                    if (context.mounted) {
+                                      context.go(
+                                        '/home/chapter/${hadith.chapterId}?startIndex=$hIndex',
                                       );
                                     }
-
-                                    final hadith = _results[index];
-                                    final query = _controller.text;
-                                    return Container(
-                                      margin: const EdgeInsets.only(bottom: 8),
-                                      decoration: BoxDecoration(
-                                        color: isDark ? AppTheme.cardDark : Colors.white,
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-                                            blurRadius: 4,
-                                            offset: const Offset(0, 2),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          borderRadius: BorderRadius.circular(12),
-                                          onTap: () async {
-                                            final repo = ref.read(hadithRepositoryProvider);
-                                            final hIndex = await repo.getHadithIndex(hadith.chapterId, hadith.hadithNumber);
-                                            if (context.mounted) {
-                                              context.go('/home/chapter/${hadith.chapterId}?startIndex=$hIndex');
-                                            }
-                                          },
-                                          onLongPress: () => _showAddToCollectionDialog(hadith),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(12),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Container(
-                                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                      decoration: BoxDecoration(
-                                                        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                                                        borderRadius: BorderRadius.circular(4),
-                                                      ),
-                                                      child: Text(
-                                                        'Hadith #${hadith.hadithNumber} — Ch. ${hadith.chapterId}',
-                                                        style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 12,
-                                                          color: Theme.of(context).primaryColor,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Row(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: [
-                                                        InkWell(
-                                                          onTap: () => _showAddToCollectionDialog(hadith),
-                                                          child: Padding(
-                                                            padding: const EdgeInsets.all(4),
-                                                            child: Icon(Icons.playlist_add, size: 20, color: Colors.grey.shade400),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 6),
-                                                // Highlighted text
-                                                _buildHighlightedText(
-                                                  hadith.englishText,
-                                                  query,
-                                                  AppTheme.safeGetFont(
-                                                    settings.englishFontFamily,
-                                                    color: AppTheme.getFontColor(settings.englishFontColor, isDark) ?? (isDark ? Colors.grey.shade300 : Colors.grey.shade700),
-                                                    fontSize: 13,
+                                  },
+                                  onLongPress: () =>
+                                      _showAddToCollectionDialog(hadith),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 6,
+                                                    vertical: 2,
                                                   ),
-                                                  isDark,
-                                                  3,
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context)
+                                                    .primaryColor
+                                                    .withValues(alpha: 0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                              ),
+                                              child: Text(
+                                                'Hadith #${hadith.hadithNumber} — Ch. ${hadith.chapterId}',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 12,
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).primaryColor,
+                                                ),
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                InkWell(
+                                                  onTap: () =>
+                                                      _showAddToCollectionDialog(
+                                                        hadith,
+                                                      ),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(4),
+                                                    child: Icon(
+                                                      Icons.playlist_add,
+                                                      size: 20,
+                                                      color: isDark
+                                                          ? Colors.grey.shade500
+                                                          : Colors.grey.shade400,
+                                                    ),
+                                                  ),
                                                 ),
                                               ],
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                      ),
-                                    ).animate().fadeIn(delay: (50 * index).ms);
-                                  },
+                                        const SizedBox(height: 6),
+                                        // Highlighted text
+                                        _buildHighlightedText(
+                                          hadith.englishText,
+                                          query,
+                                          AppTheme.safeGetFont(
+                                            settings.englishFontFamily,
+                                            color:
+                                                AppTheme.getFontColor(
+                                                  settings.englishFontColor,
+                                                  isDark,
+                                                ) ??
+                                                (isDark
+                                                    ? Colors.grey.shade300
+                                                    : Colors.grey.shade700),
+                                            fontSize: 13,
+                                          ),
+                                          isDark,
+                                          3,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ).animate().fadeIn(delay: (50 * index).ms);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildHighlightedText(String text, String query, TextStyle baseStyle, bool isDark, int maxLines) {
+  Widget _buildHighlightedText(
+    String text,
+    String query,
+    TextStyle baseStyle,
+    bool isDark,
+    int maxLines,
+  ) {
     if (query.isEmpty) {
-      return Text(text, maxLines: maxLines, overflow: TextOverflow.ellipsis, style: baseStyle);
+      return Text(
+        text,
+        maxLines: maxLines,
+        overflow: TextOverflow.ellipsis,
+        style: baseStyle,
+      );
     }
 
     final lowerText = text.toLowerCase();
@@ -440,14 +612,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         spans.add(TextSpan(text: text.substring(start, idx)));
       }
 
-      spans.add(TextSpan(
-        text: text.substring(idx, idx + query.length),
-        style: TextStyle(
-          backgroundColor: isDark ? Colors.amber.shade900.withValues(alpha: 0.6) : Colors.yellow.shade200,
-          fontWeight: FontWeight.bold,
-          color: isDark ? Colors.white : Colors.black,
+      spans.add(
+        TextSpan(
+          text: text.substring(idx, idx + query.length),
+          style: TextStyle(
+            backgroundColor: isDark
+                ? Colors.amber.shade900.withValues(alpha: 0.6)
+                : Colors.yellow.shade200,
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black,
+          ),
         ),
-      ));
+      );
 
       start = idx + query.length;
     }
@@ -465,57 +641,88 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (ctx) => Consumer(builder: (context, ref, _) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-        final collectionsAsync = ref.watch(collectionsProvider);
+      builder: (ctx) => Consumer(
+        builder: (context, ref, _) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          final collectionsAsync = ref.watch(collectionsProvider);
 
-        return Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.playlist_add, color: Theme.of(ctx).primaryColor),
-                  const SizedBox(width: 10),
-                  Text('Add to Collection', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: isDark ? Colors.white : AppTheme.textDark)),
-                ],
-              ),
-              const SizedBox(height: 16),
-              collectionsAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Text('Error: $e'),
-                data: (collections) {
-                  if (collections.isEmpty) {
-                    return Text('No collections yet. Create one from the Collections screen.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87));
-                  }
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: collections.map((c) => ListTile(
-                      leading: Icon(Icons.folder, color: Theme.of(context).primaryColor),
-                      title: Text(
-                        c.name,
-                        style: TextStyle(color: isDark ? Colors.white : AppTheme.textDark),
+          return Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.playlist_add, color: Theme.of(ctx).primaryColor),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Add to Collection',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: isDark ? Colors.white : AppTheme.textDark,
                       ),
-                      onTap: () async {
-                        final repo = ref.read(hadithRepositoryProvider);
-                        await repo.addHadithToCollection(c.id, hadith.id);
-                        if (ctx.mounted) Navigator.pop(ctx);
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Added to "${c.name}" ✓')),
-                          );
-                        }
-                      },
-                    )).toList(),
-                  );
-                },
-              ),
-            ],
-          ),
-        );
-      }),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                collectionsAsync.when(
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Text('Error: $e'),
+                  data: (collections) {
+                    if (collections.isEmpty) {
+                      return Text(
+                        'No collections yet. Create one from the Collections screen.',
+                        style: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.black87,
+                        ),
+                      );
+                    }
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: collections
+                          .map(
+                            (c) => ListTile(
+                              leading: Icon(
+                                Icons.folder,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                              title: Text(
+                                c.name,
+                                style: TextStyle(
+                                  color: isDark
+                                      ? Colors.white
+                                      : AppTheme.textDark,
+                                ),
+                              ),
+                              onTap: () async {
+                                final repo = ref.read(hadithRepositoryProvider);
+                                await repo.addHadithToCollection(
+                                  c.id,
+                                  hadith.id,
+                                );
+                                if (ctx.mounted) Navigator.pop(ctx);
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Added to "${c.name}" ✓'),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          )
+                          .toList(),
+                    );
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -528,37 +735,54 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+              isSelected
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_unchecked,
               size: 18,
               color: isSelected ? Theme.of(context).primaryColor : Colors.grey,
             ),
             const SizedBox(width: 4),
-            Flexible(child: Text(value, style: TextStyle(
-              fontSize: 12,
-              color: isDark ? Colors.grey.shade300 : AppTheme.textDark,
-            ))),
+            Flexible(
+              child: Text(
+                value,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark ? Colors.grey.shade300 : AppTheme.textDark,
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildFilterChip(String label, bool selected, VoidCallback onTap, bool isDark) {
+  Widget _buildFilterChip(
+    String label,
+    bool selected,
+    VoidCallback onTap,
+    bool isDark,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+            selected
+                ? Icons.radio_button_checked
+                : Icons.radio_button_unchecked,
             size: 18,
             color: selected ? Theme.of(context).primaryColor : Colors.grey,
           ),
           const SizedBox(width: 4),
-          Text(label, style: TextStyle(
-            fontSize: 12,
-            color: isDark ? Colors.grey.shade300 : AppTheme.textDark,
-          )),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? Colors.grey.shade300 : AppTheme.textDark,
+            ),
+          ),
         ],
       ),
     );

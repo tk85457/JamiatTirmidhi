@@ -20,13 +20,24 @@ class ShimmerLoading extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          Container(width: 50, height: 50, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle)),
+          Container(
+            width: 50,
+            height: 50,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+          ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(width: double.infinity, height: 16, color: Colors.white),
+                Container(
+                  width: double.infinity,
+                  height: 16,
+                  color: Colors.white,
+                ),
                 const SizedBox(height: 8),
                 Container(width: 150, height: 12, color: Colors.white),
               ],

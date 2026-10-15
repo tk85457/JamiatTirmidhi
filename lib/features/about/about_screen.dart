@@ -12,10 +12,7 @@ class AboutScreen extends StatelessWidget {
     final primary = Theme.of(context).primaryColor;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('About'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('About'), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -43,7 +40,10 @@ class AboutScreen extends StatelessWidget {
                     height: 110,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: primary.withValues(alpha: 0.4), width: 3),
+                      border: Border.all(
+                        color: primary.withValues(alpha: 0.4),
+                        width: 3,
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: primary.withValues(alpha: 0.2),
@@ -54,16 +54,16 @@ class AboutScreen extends StatelessWidget {
                     ),
                     child: ClipOval(
                       child: Image.asset(
-                        'assets/icon/icon.png',
+                        'assets/icon/icon_circle.webp',
                         width: 110,
                         height: 110,
-                        fit: BoxFit.contain, // Changed to contain for perfect fit
+                        fit: BoxFit.cover, // Full fit in circle
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'سنن ابن ماجہ',
+                   Text(
+                   'جامع الترمذی',
                     style: GoogleFonts.amiri(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -73,45 +73,58 @@ class AboutScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Sunan Ibn Majah',
+                    'Jami at-Tirmidhi Hadith',
                     style: GoogleFonts.rubik(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                      color: isDark
+                          ? Colors.grey.shade400
+                          : Colors.grey.shade600,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Version 1.0.0',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade500,
+                    ),
                   ),
                 ],
               ),
             ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.05, end: 0),
             const SizedBox(height: 16),
 
-            // About Sunan Ibn Majah
-            _buildCard(context, isDark, 'About Sunan Ibn Majah', Icons.info_outline, [
-              'Sunan Ibn Majah is a collection of hadith compiled by Imam Ibn Majah (rahimahullah) in the 9th century.',
-              'It is widely considered to be the sixth of the six major collections of hadith (Kutub al-Sittah).',
-              'It consists of over 4,000 ahadith divided into 32 books.',
-              'The collection is highly regarded for its comprehensive coverage of Fiqh (jurisprudence) topics.',
+            // About Jami at-Tirmidhi
+            _buildCard(context, isDark, 'About Jami at-Tirmidhi', Icons.info_outline, [
+              'Jami at-Tirmidhi is a collection of hadith compiled by Imam at-Tirmidhi (rahimahullah) in the 9th century.',
+              'It is one of the six major collections of hadith (Kutub al-Sittah) and is prized for its scholarly analysis.',
+              'It consists of over 3,900 ahadith divided into various chapters of law, manners, and creed.',
+              'Imam Tirmidhi was the first to categorize hadiths into Sahih, Hasan, and Da\'if levels in a systematic way.',
             ], 0),
             const SizedBox(height: 12),
 
             // About Author
-            _buildCard(context, isDark, 'About Imam Ibn Majah', Icons.person_outline, [
-              'Full Name: Abu Abdullah Muhammad ibn Yazid Ibn Majah al-Rabai al-Qazwini',
-              'Born: 824 CE (209 AH) in Qazvin, present-day Iran',
-              'Died: 887 CE (273 AH) in Qazvin',
-              'He traveled widely across the Islamic world to Iraq, Hejaz, Syria, and Egypt to gather hadiths.',
-              'He was a prominent student of many great scholars of his time and a renowned traditionalist.',
-            ], 1),
+            _buildCard(
+              context,
+              isDark,
+              'About Imam at-Tirmidhi',
+              Icons.person_outline,
+              [
+                'Full Name: Muhammad ibn Isa as-Sulami ad-Darir al-Bughi at-Tirmidhi',
+                'Born: 824 CE (209 AH) in Termez (Modern Uzbekistan)',
+                'Died: 892 CE (279 AH) in Termez',
+                'He was a student of Imam Bukhari and traveled extensively to gather knowledge.',
+                'He is also famous for his work "ash-Shama\'il al-Muhammadiyya" on the character of the Prophet (PBUH).',
+              ],
+              1,
+              showCircleIcon: true,
+            ),
             const SizedBox(height: 12),
 
             // App Features
             _buildCard(context, isDark, 'App Features', Icons.star_outline, [
-              '• Complete Sunan Ibn Majah collection',
+              '• Complete Jami at-Tirmidhi collection',
               '• Arabic, Urdu & English translations',
               '• Bookmark your favourite hadiths',
               '• Create custom collections',
@@ -128,51 +141,98 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCard(BuildContext context, bool isDark, String title, IconData icon, List<String> items, int delay) {
+  Widget _buildCard(
+    BuildContext context,
+    bool isDark,
+    String title,
+    IconData icon,
+    List<String> items,
+    int delay, {
+    bool showCircleIcon = false,
+  }) {
+    final primary = Theme.of(context).primaryColor;
+
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.cardDark : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: isDark ? AppTheme.cardDark : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, color: Theme.of(context).primaryColor, size: 22),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 17,
-                  color: Theme.of(context).primaryColor,
+              Row(
+                children: [
+                  Icon(icon, color: Theme.of(context).primaryColor, size: 22),
+                  const SizedBox(width: 8),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 17,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+              if (showCircleIcon) ...[
+                const SizedBox(height: 16),
+                Center(
+                  child: Container(
+                    width: 90,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: primary.withValues(alpha: 0.3),
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: primary.withValues(alpha: 0.1),
+                          blurRadius: 15,
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/icon/icon_circle.webp',
+                        width: 90,
+                        height: 90,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 12),
+              ...items.map(
+                (item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Text(
+                    item,
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      height: 1.5,
+                      color: isDark
+                          ? Colors.grey.shade300
+                          : Colors.grey.shade700,
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          ...items.map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Text(
-              item,
-              style: TextStyle(
-                fontSize: 13.5,
-                height: 1.5,
-                color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
-              ),
-            ),
-          )),
-        ],
-      ),
-    ).animate().fadeIn(delay: (150 * delay).ms, duration: 400.ms).slideY(begin: 0.05, end: 0);
+        )
+        .animate()
+        .fadeIn(delay: (150 * delay).ms, duration: 400.ms)
+        .slideY(begin: 0.05, end: 0);
   }
 }
