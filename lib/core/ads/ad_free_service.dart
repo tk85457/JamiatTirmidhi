@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Tracks the "banner ads off for 24 hours" reward and the 24-hour popup schedule.
+/// Tracks the "banner ads off for 24 hours" reward and the 12-hour popup schedule.
 ///
 /// Everything is stored locally in SharedPreferences (no network, no extra SDK),
-/// so it is cheap on low-end devices and works offline.
+/// so it is cheap on low-end devices and works offline with zero crash risk.
 ///
 /// Tamper protection (best effort, no server clock available):
 ///  * the reward window can never be longer than [adFreeDuration] from "now",
@@ -17,8 +17,8 @@ class AdFreeService {
   /// How long banner ads stay off after a rewarded ad is completed.
   static const Duration adFreeDuration = Duration(hours: 24);
 
-  /// Minimum gap between two popups.
-  static const Duration promptInterval = Duration(hours: 24);
+  /// Minimum gap between two popups when user does not watch the video ad (12 hours).
+  static const Duration promptInterval = Duration(hours: 12);
 
   /// Tolerance for small clock adjustments (NTP sync, timezone change, etc.).
   static const Duration _clockTolerance = Duration(minutes: 5);
@@ -38,7 +38,7 @@ class AdFreeService {
 
   static int get _nowMs => DateTime.now().millisecondsSinceEpoch;
 
-  /// Loads the saved state. Call once from `main()` before `runApp`.
+  /// Loads the saved state. Call once from `_Bootstrap` or `main()` before `runApp`.
   static void init(SharedPreferences prefs) {
     _prefs = prefs;
     try {
@@ -110,12 +110,17 @@ class AdFreeService {
 
   /// `true` when the rewarded-ad / banner choice popup must be shown.
   ///
-  /// Rule: ask on every app open, EXCEPT while the 24 h ad-free window earned
-  /// by watching a rewarded ad is active. Once that window ends, the popup
-  /// comes back on the next app open.
-  static bool shouldShowPrompt() => !_computeActive(_nowMs);
+  /// Rule:
+  /// - If 24 h ad-free window is active -> do NOT show.
+  /// - If user did not watch / dismissed previously -> show only after 12 hours have passed.
+  static bool shouldShowPrompt() {
+    final now = _nowMs;
+    if (_computeActive(now)) return false;
+    if (_lastPromptMs <= 0) return true; // First time ever
+    return (now - _lastPromptMs) >= promptInterval.inMilliseconds;
+  }
 
-  /// Records that the popup was shown now (so it is not shown again for 24 h).
+  /// Records that the popup was shown / dismissed (starts the 12-hour cooldown).
   static Future<void> markPromptShown() async {
     _lastPromptMs = _nowMs;
     try {

@@ -16,17 +16,18 @@ class AdChoiceDialog extends StatefulWidget {
 
   /// Opens the right dialog: the choice dialog, or - when banners are already
   /// off - a small info dialog showing the remaining time.
-  static Future<void> show(BuildContext context) {
+  static Future<void> show(BuildContext context) async {
     if (AdFreeService.isAdFree) {
       return showDialog<void>(
         context: context,
         builder: (_) => const _AdFreeActiveDialog(),
       );
     }
-    return showDialog<void>(
+    await showDialog<void>(
       context: context,
       builder: (_) => const AdChoiceDialog(),
     );
+    await AdFreeService.markPromptShown();
   }
 
   @override
@@ -43,8 +44,7 @@ class _AdChoiceDialogState extends State<AdChoiceDialog> {
   @override
   void initState() {
     super.initState();
-    // Preload while the user reads the dialog so the ad opens instantly,
-    // even on slow connections / low-end phones.
+    // Preload while user reads dialog so ad opens instantly
     _loadAd();
   }
 
@@ -96,7 +96,7 @@ class _AdChoiceDialogState extends State<AdChoiceDialog> {
       return;
     }
 
-    // Ad still loading (or the last load failed): remember the tap and retry.
+    // Ad still loading: remember tap and retry
     setState(() {
       _userWantsToWatch = true;
       _note = null;
@@ -118,7 +118,6 @@ class _AdChoiceDialogState extends State<AdChoiceDialog> {
     final earned = await AdService.showRewarded(ad);
 
     if (earned) {
-      // Persist the reward even if the dialog was somehow closed meanwhile.
       await AdFreeService.grantAdFree();
       if (!mounted) return;
       final messenger = ScaffoldMessenger.maybeOf(context);
@@ -140,14 +139,14 @@ class _AdChoiceDialogState extends State<AdChoiceDialog> {
       _isShowing = false;
       _note = 'Please watch the full ad to switch banner ads off.';
     });
-    _loadAd(); // get the next ad ready for another try
+    _loadAd();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final primary = theme.primaryColor;
+    final primary = const Color(0xFF0A7E47);
     final textColor = isDark ? Colors.white : AppTheme.textDark;
     final subColor = isDark ? Colors.grey.shade400 : Colors.grey.shade700;
 
@@ -162,7 +161,7 @@ class _AdChoiceDialogState extends State<AdChoiceDialog> {
 
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      backgroundColor: isDark ? AppTheme.cardDark : Colors.white,
+      backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
@@ -204,7 +203,7 @@ class _AdChoiceDialogState extends State<AdChoiceDialog> {
             ),
             const SizedBox(height: 8),
             Text(
-              'ایک مختصر اشتہار دیکھیں، اگلے 24 گھنٹے تک بینر اشتہارات بند رہیں گے۔',
+              'ایک مختصر اشتہار دیکھیں، اگلے 24 گھنٹے تک تمام بینر اشتہارات بند رہیں گے۔',
               textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
               style: TextStyle(fontSize: 13.5, height: 1.8, color: subColor),
@@ -225,6 +224,7 @@ class _AdChoiceDialogState extends State<AdChoiceDialog> {
             FilledButton(
               onPressed: _isShowing ? null : _onWatchTap,
               style: FilledButton.styleFrom(
+                backgroundColor: primary,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -262,7 +262,12 @@ class _AdChoiceDialogState extends State<AdChoiceDialog> {
             ),
             const SizedBox(height: 6),
             TextButton(
-              onPressed: _isShowing ? null : () => Navigator.of(context).pop(),
+              onPressed: _isShowing
+                  ? null
+                  : () {
+                      AdFreeService.markPromptShown();
+                      Navigator.of(context).pop();
+                    },
               child: Text(
                 'Continue with banner ads',
                 style: TextStyle(
@@ -294,7 +299,7 @@ class _AdFreeActiveDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return AlertDialog(
-      backgroundColor: isDark ? AppTheme.cardDark : Colors.white,
+      backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       icon: const Icon(
         Icons.verified_rounded,
@@ -322,8 +327,8 @@ class _AdFreeActiveDialog extends StatelessWidget {
   }
 }
 
-/// Wrap the home screen with this. On every app launch it shows
-/// [AdChoiceDialog], unless the 24 h ad-free reward is still active.
+/// Wrap the home screen with this. It checks the 12-hour schedule on app launch
+/// and shows [AdChoiceDialog] without causing any freezes or ANRs.
 class AdChoicePromptHost extends StatefulWidget {
   final Widget child;
 
@@ -334,7 +339,6 @@ class AdChoicePromptHost extends StatefulWidget {
 }
 
 class _AdChoicePromptHostState extends State<AdChoicePromptHost> {
-  /// Process-wide guard: the home screen can be rebuilt several times.
   static bool _checkedThisLaunch = false;
 
   @override
